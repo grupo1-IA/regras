@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA que toma decisões seguindo regras</title>
+<style>
+:root{--bg:#071426;--panel:#10233d;--cyan:#54d6e8;--yellow:#ffd166;--white:#f4f8ff;--muted:#b8c7d9;--pink:#ff7aa2}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--white)}
+body{background:radial-gradient(circle at 18% 18%,#173b5c 0,transparent 32%),radial-gradient(circle at 85% 80%,#25335c 0,transparent 34%),#071426}
+#world{position:absolute;inset:0;transform-origin:50% 50%;transition:transform 1.05s cubic-bezier(.2,.8,.2,1)}
+.slide{position:absolute;width:min(78vw,1050px);height:min(70vh,650px);left:50%;top:50%;transform:translate(-50%,-50%);padding:clamp(25px,4vw,58px);border:1px solid #ffffff20;border-radius:30px;background:linear-gradient(145deg,#102945ed,#0b1c32f2);box-shadow:0 30px 90px #0008;display:flex;flex-direction:column;justify-content:center;gap:20px;opacity:.18;transition:opacity .6s}
+.slide.active{opacity:1}
+.kicker{color:var(--cyan);font-size:clamp(12px,1.2vw,16px);font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(34px,5.5vw,72px);line-height:1.02;margin:0;letter-spacing:-.04em}
+h2{font-size:clamp(28px,4vw,52px);line-height:1.06;margin:0;letter-spacing:-.03em}
+p{font-size:clamp(17px,1.8vw,24px);line-height:1.45;color:var(--muted);margin:0;max-width:850px}
+strong{color:var(--white)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.tile{padding:20px;border-radius:18px;background:#ffffff0b;border:1px solid #ffffff17;min-height:110px}
+.tile b{display:block;color:var(--yellow);font-size:clamp(17px,1.6vw,22px);margin-bottom:8px}
+.tile span{color:var(--muted);font-size:clamp(14px,1.35vw,18px);line-height:1.35}
+.rule{display:flex;align-items:center;gap:15px;padding:14px 18px;border-radius:14px;background:#ffffff0b;border-left:4px solid var(--cyan);font-size:clamp(17px,1.8vw,24px)}
+.rule em{font-style:normal;color:var(--yellow);font-weight:800}
+.big-icon{font-size:clamp(52px,7vw,90px);line-height:1}
+.presenter{position:absolute;right:28px;top:24px;color:#c2d2e4;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.number{position:absolute;left:30px;top:25px;color:#8ea5bf;font-size:13px}
+.visual{display:flex;align-items:center;justify-content:center;gap:clamp(15px,3vw,36px);flex-wrap:wrap;margin:10px 0}
+.bubble{width:clamp(105px,12vw,155px);height:clamp(105px,12vw,155px);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;background:#173a58;border:1px solid #6ddded66;font-size:clamp(14px,1.5vw,19px);font-weight:700}
+.arrow{font-size:34px;color:var(--yellow)}
+.note{font-size:14px;color:#90a8c2}
+.controls{position:fixed;z-index:10;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;background:#06101ddd;border:1px solid #ffffff24;backdrop-filter:blur(12px)}
+button{border:0;border-radius:999px;padding:11px 17px;background:#173b5c;color:white;font-weight:700;cursor:pointer}button:hover{background:#23577e}button.primary{background:var(--cyan);color:#062033}
+#counter{font-size:13px;color:#b9cbe0;min-width:58px;text-align:center}
+#progress{position:fixed;z-index:10;top:0;left:0;height:4px;background:var(--cyan);width:0;transition:width .4s}
+#help{position:fixed;right:20px;bottom:22px;color:#a9bbce;font-size:12px}
+#overview{position:fixed;inset:0;z-index:20;background:#06101df2;display:none;padding:5vh 5vw;overflow:auto}
+#overview.show{display:block}.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:24px}
+.thumb{padding:20px;min-height:125px;text-align:left;border:1px solid #ffffff24;border-radius:16px;background:#10233d;color:white}
+.thumb small{display:block;color:var(--cyan);margin-bottom:12px}.thumb b{font-size:17px}
+.quiz-option{display:block;width:100%;text-align:left;margin:8px 0;border-radius:12px;background:#ffffff10;border:1px solid #ffffff22}
+.feedback{min-height:28px;color:var(--yellow);font-weight:700}
+@media(max-width:700px){.slide{width:92vw;height:78vh;padding:24px;border-radius:22px}.grid{grid-template-columns:1fr;gap:8px}.tile{min-height:auto;padding:12px}.presenter{right:18px;top:16px;font-size:10px}.number{left:18px;top:16px}.controls{bottom:12px;gap:5px}.controls button{padding:10px 12px}#help{display:none}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="world">
+<section class="slide" data-title="A inteligência artificial está em todo lugar!" data-presenter="Moisés Lopes">
+<div class="number">01 / 14</div><div class="presenter">Moisés Lopes · Introdução</div>
+<div class="kicker">Introdução</div><h1>A inteligência artificial está em todo lugar!</h1>
+<p>Ela aparece quando conversamos com um chatbot, usamos mapas ou recebemos sugestões de vídeos.</p>
+<div class="grid"><div class="tile"><b>💬 Chatbots</b><span>Respondem perguntas e ajudam em tarefas.</span></div><div class="tile"><b>🗺️ Mapas</b><span>Calculam rotas e sugerem caminhos.</span></div><div class="tile"><b>▶️ Recomendações</b><span>Indicam conteúdos de acordo com nossos interesses.</span></div></div>
+</section>
+<section class="slide" data-title="Como uma máquina pode tomar decisões?" data-presenter="Moisés Lopes">
+<div class="number">02 / 14</div><div class="presenter">Moisés Lopes · Introdução</div><div class="kicker">A pergunta principal</div><h2>Como uma máquina pode tomar decisões?</h2>
+<p>Um sistema pode decidir de diferentes maneiras:</p><div class="visual"><div class="bubble">📋<br>Seguindo regras</div><div class="bubble">📊<br>Identificando padrões</div><div class="bubble">🔀<br>Combinando métodos</div></div>
+<p>Hoje vamos descobrir como isso funciona e onde encontramos esses sistemas.</p>
+</section>
+<section class="slide" data-title="Afinal, o que é IA?" data-presenter="Soraia Miranda">
+<div class="number">03 / 14</div><div class="presenter">Soraia Miranda · O que é IA</div><div class="kicker">Conceito</div><h2>Afinal, o que é inteligência artificial?</h2>
+<p>É uma área da computação que desenvolve sistemas capazes de realizar tarefas que normalmente exigem habilidades associadas à inteligência humana.</p>
+<div class="grid"><div class="tile"><b>👁️ Reconhecer</b><span>Imagens e sons.</span></div><div class="tile"><b>🔎 Identificar</b><span>Padrões em informações.</span></div><div class="tile"><b>🧠 Apoiar</b><span>Respostas e decisões.</span></div></div>
+<p class="note">Exemplo: o celular reconhece o rosto para desbloquear a tela.</p>
+</section>
+<section class="slide" data-title="Como a IA consegue realizar essas tarefas?" data-presenter="Soraia Miranda">
+<div class="number">04 / 14</div><div class="presenter">Soraia Miranda · O que é IA</div><div class="kicker">Como funciona</div><h2>Como a IA consegue realizar essas tarefas?</h2>
+<p>Existem diferentes técnicas. Alguns sistemas seguem regras programadas; outros identificam padrões a partir de exemplos e dados.</p>
+<div class="visual"><div class="bubble">📷<br>Imagem de um cão</div><div class="arrow">→</div><div class="bubble">⚙️<br>Análise do sistema</div><div class="arrow">→</div><div class="bubble">🐶<br>“É um cachorro”</div></div>
+<p class="note">Nem todos os sistemas funcionam da mesma maneira.</p>
+</section>
+<section class="slide" data-title="Quem ensina o computador a decidir?" data-presenter="Wellington Oliveira">
+<div class="number">05 / 14</div><div class="presenter">Wellington Oliveira · Regras</div><div class="kicker">Decisões por regras</div><h2>Quem ensina o computador a decidir?</h2>
+<p>Em um sistema baseado em regras, as pessoas definem as condições que o computador deve seguir.</p>
+<div class="rule">SE o sinal estiver <em>vermelho</em>, ENTÃO pare.</div><div class="rule">SE o sinal estiver <em>verde</em>, ENTÃO siga.</div><div class="rule">SE o sinal estiver <em>amarelo</em>, ENTÃO atenção.</div>
+<p>É como uma receita: para cada condição, existe uma ação prevista.</p>
+</section>
+<section class="slide" data-title="As regras na prática: a entrada da escola" data-presenter="Wellington Oliveira">
+<div class="number">06 / 14</div><div class="presenter">Wellington Oliveira · Regras</div><div class="kicker">Exemplo prático</div><h2>As regras na prática: a entrada da escola</h2>
+<div class="rule">SE tem identificação válida <em>e</em> chegou no horário, ENTÃO permita a entrada.</div><div class="rule">SE não tem identificação, ENTÃO encaminhe à coordenação.</div><div class="rule">SE chegou atrasado, ENTÃO solicite autorização.</div>
+<div class="visual"><div class="bubble">📥<br>Entrada de dados</div><div class="arrow">→</div><div class="bubble">⚙️<br>Verificação das regras</div><div class="arrow">→</div><div class="bubble">📤<br>Decisão</div></div>
+<p class="note">Se as regras forem mal definidas, o sistema também poderá tomar decisões inadequadas.</p>
+</section>
+<section class="slide" data-title="Toda inteligência artificial precisa aprender?" data-presenter="Jesiel da Silva">
+<div class="number">07 / 14</div><div class="presenter">Jesiel da Silva · Aprendizado de máquina</div><div class="kicker">Uma ideia importante</div><h2>Toda inteligência artificial precisa aprender?</h2>
+<p><strong>Não!</strong> Alguns sistemas inteligentes funcionam com regras definidas por pessoas, sem aprender com grandes conjuntos de dados.</p>
+<div class="grid"><div class="tile"><b>📋 Sistema baseado em regras</b><span>Segue instruções e condições previamente programadas.</span></div><div class="tile"><b>📈 Aprendizado de máquina</b><span>Identifica padrões a partir de dados e exemplos.</span></div><div class="tile"><b>💡 Os dois</b><span>São abordagens diferentes que podem ser combinadas.</span></div></div>
+</section>
+<section class="slide" data-title="Regras ou aprendizado de máquina?" data-presenter="Jesiel da Silva">
+<div class="number">08 / 14</div><div class="presenter">Jesiel da Silva · Aprendizado de máquina</div><div class="kicker">Comparando exemplos</div><h2>Regras ou aprendizado de máquina?</h2>
+<div class="grid"><div class="tile"><b>✊ Pedra, papel e tesoura</b><span>As regras do jogo podem ser programadas: pedra vence tesoura, tesoura vence papel e papel vence pedra.</span></div><div class="tile"><b>🍎 Reconhecer frutas</b><span>Um modelo pode analisar muitas imagens e aprender padrões para diferenciar frutas.</span></div></div>
+<p><strong>Resumo:</strong> regras seguem condições definidas; aprendizado de máquina identifica padrões nos dados.</p>
+</section>
+<section class="slide" data-title="Onde encontramos a inteligência artificial?" data-presenter="Mariestala Lima">
+<div class="number">09 / 14</div><div class="presenter">Mariestala Lima · IA no cotidiano</div><div class="kicker">No dia a dia</div><h2>Onde encontramos a inteligência artificial?</h2>
+<div class="grid"><div class="tile"><b>📱 Celular</b><span>Reconhecimento facial e assistentes virtuais.</span></div><div class="tile"><b>🎵 Entretenimento</b><span>Sugestões de músicas e vídeos.</span></div><div class="tile"><b>🚗 Transporte</b><span>Rotas e previsão de trânsito.</span></div><div class="tile"><b>🌐 Comunicação</b><span>Tradução automática.</span></div><div class="tile"><b>📚 Educação</b><span>Recursos de apoio ao estudo.</span></div><div class="tile"><b>🛍️ Compras</b><span>Recomendações de produtos.</span></div></div>
+</section>
+<section class="slide" data-title="A IA está presente em diferentes lugares!" data-presenter="Mariestala Lima">
+<div class="number">10 / 14</div><div class="presenter">Mariestala Lima · IA no cotidiano</div><div class="kicker">Um dia conectado</div><h2>A IA está presente em diferentes lugares!</h2>
+<div class="visual"><div class="bubble">☀️<br>Desbloqueia o celular</div><div class="arrow">→</div><div class="bubble">🗺️<br>Consulta uma rota</div><div class="arrow">→</div><div class="bubble">🎬<br>Recebe sugestões</div><div class="arrow">→</div><div class="bubble">🌎<br>Traduz uma frase</div></div>
+<p>Quais dessas ferramentas vocês já utilizaram? Qual delas faz parte da rotina de vocês?</p>
+</section>
+<section class="slide" data-title="Como a inteligência artificial facilita nossa vida?" data-presenter="Veronica Belmonte">
+<div class="number">11 / 14</div><div class="presenter">Veronica Belmonte · Como nos ajuda</div><div class="kicker">Benefícios</div><h2>Como a inteligência artificial facilita nossa vida?</h2>
+<div class="grid"><div class="tile"><b>📚 Educação</b><span>Ajuda a estudar, pesquisar e organizar ideias.</span></div><div class="tile"><b>🩺 Saúde</b><span>Pode apoiar a análise de exames e informações.</span></div><div class="tile"><b>🚌 Transporte</b><span>Ajuda a planejar trajetos.</span></div><div class="tile"><b>💬 Comunicação</b><span>Facilita traduções e interações.</span></div><div class="tile"><b>♿ Acessibilidade</b><span>Oferece recursos como leitura e transcrição.</span></div><div class="tile"><b>⏱️ Organização</b><span>Agiliza tarefas e processos.</span></div></div>
+</section>
+<section class="slide" data-title="A IA ajuda, mas não faz tudo sozinha!" data-presenter="Veronica Belmonte">
+<div class="number">12 / 14</div><div class="presenter">Veronica Belmonte · Como nos ajuda</div><div class="kicker">Uso responsável</div><h2>A IA ajuda, mas não faz tudo sozinha!</h2>
+<div class="grid"><div class="tile"><b>✓ Pode ajudar</b><span>Agilizar tarefas, organizar informações e apoiar a solução de problemas.</span></div><div class="tile"><b>⚠ É preciso atenção</b><span>Pode apresentar respostas incorretas ou reproduzir vieses presentes nos dados.</span></div><div class="tile"><b>👥 Pessoas são responsáveis</b><span>É necessário conferir resultados, acompanhar e fazer escolhas conscientes.</span></div></div>
+<p>Podemos confiar em tudo o que uma inteligência artificial responde?</p>
+</section>
+<section class="slide" data-title="O que aprendemos sobre inteligência artificial?" data-presenter="Glaucio da Silva">
+<div class="number">13 / 14</div><div class="presenter">Glaucio da Silva · Conclusão</div><div class="kicker">Retomando ideias</div><h2>O que aprendemos sobre inteligência artificial?</h2>
+<div class="grid"><div class="tile"><b>01 · O que é IA?</b><span>Sistemas que realizam tarefas associadas à inteligência.</span></div><div class="tile"><b>02 · Regras</b><span>Condições definidas por pessoas orientam decisões.</span></div><div class="tile"><b>03 · Aprendizado</b><span>Nem toda IA utiliza aprendizado de máquina.</span></div><div class="tile"><b>04 · Cotidiano</b><span>A IA está presente em muitas ferramentas que usamos.</span></div></div>
+</section>
+<section class="slide" data-title="A inteligência artificial depende de escolhas humanas!" data-presenter="Glaucio da Silva">
+<div class="number">14 / 14</div><div class="presenter">Glaucio da Silva · Conclusão</div><div class="kicker">Mensagem final</div><h1>A inteligência artificial depende de escolhas humanas!</h1>
+<p>As pessoas desenvolvem, programam, definem regras, acompanham resultados e escolhem como utilizar essas tecnologias.</p>
+<div class="visual"><div class="bubble">👩‍💻<br>Pessoas</div><div class="arrow">→</div><div class="bubble">⚙️<br>Tecnologia</div><div class="arrow">→</div><div class="bubble">🌍<br>Impacto na sociedade</div></div>
+<p><strong>Agora é a hora do nosso quiz!</strong></p>
+</section>
+<section class="slide" id="quiz" data-title="Quiz: vamos testar o que aprendemos?" data-presenter="Todos os apresentadores">
+<div class="number">QUIZ</div><div class="presenter">Todos · Aplicação do quiz</div><div class="kicker">Momento interativo</div><h2>Vamos testar o que aprendemos?</h2>
+<p id="qtext">1. O que caracteriza a inteligência artificial?</p>
+<div id="answers"></div><div class="feedback" id="feedback"></div>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><button class="primary" id="nextq">Próxima pergunta</button><button id="restart">Recomeçar quiz</button></div>
+<p class="note" id="qcount">Pergunta 1 de 8</p>
+</section>
+</div>
+<div class="controls"><button id="prev" aria-label="Anterior">←</button><span id="counter">1 / 15</span><button class="primary" id="next" aria-label="Próximo">Próximo →</button><button id="map">Mapa</button><button id="fullscreen">⛶</button></div>
+<div id="help">Use ← → ou espaço para navegar</div>
+<div id="overview"><h2>Mapa da apresentação</h2><p>Escolha um ponto para aproximar e continuar a apresentação.</p><div class="overview-grid" id="thumbs"></div><button id="closemap" style="margin-top:20px">Voltar à apresentação</button></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')],world=document.getElementById('world');
+let current=0;
+function go(i){current=Math.max(0,Math.min(slides.length-1,i));const s=slides[current];slides.forEach(x=>x.classList.remove('active'));s.classList.add('active');
+const r=s.getBoundingClientRect(),scale=Math.min(innerWidth/(r.width+80),innerHeight/(r.height+80),1.12);
+const x=innerWidth/2-(s.offsetLeft+s.offsetWidth/2),y=innerHeight/2-(s.offsetTop+s.offsetHeight/2);
+world.style.transform=`translate(${x}px,${y}px) scale(${scale})`;
+document.getElementById('counter').textContent=`${current+1} / ${slides.length}`;
+document.getElementById('progress').style.width=((current+1)/slides.length*100)+'%';
+document.getElementById('prev').disabled=current===0;document.getElementById('next').textContent=current===slides.length-1?'Fim':'Próximo →';
+}
+document.getElementById('prev').onclick=()=>go(current-1);document.getElementById('next').onclick=()=>go(current+1);
+document.getElementById('fullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
+document.getElementById('map').onclick=()=>document.getElementById('overview').classList.add('show');
+document.getElementById('closemap').onclick=()=>document.getElementById('overview').classList.remove('show');
+slides.forEach((s,i)=>{let b=document.createElement('button');b.className='thumb';b.innerHTML=`<small>${String(i+1).padStart(2,'0')} · ${s.dataset.presenter||''}</small><b>${s.dataset.title||'Quiz'}</b>`;b.onclick=()=>{document.getElementById('overview').classList.remove('show');go(i)};document.getElementById('thumbs').appendChild(b)});
+document.addEventListener('keydown',e=>{if(document.getElementById('overview').classList.contains('show')){if(e.key==='Escape')document.getElementById('overview').classList.remove('show');return}if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();go(current+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(current-1)}if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+const questions=[
+{q:'1. O que caracteriza a inteligência artificial?',a:['Sistemas capazes de realizar tarefas como reconhecer padrões e apoiar decisões.','Qualquer aparelho eletrônico, mesmo sem programação.','Apenas robôs com aparência humana.'],c:0,e:'IA envolve sistemas que realizam tarefas como reconhecer informações, identificar padrões e apoiar decisões.'},
+{q:'2. No exemplo do semáforo, o que acontece quando a luz está vermelha?',a:['O sistema indica para seguir.','O sistema indica para parar.','O sistema desliga.'],c:1,e:'A regra programada é: SE vermelho, ENTÃO pare.'},
+{q:'3. O que o aprendizado de máquina faz?',a:['Segue somente uma lista fixa de respostas.','Identifica padrões a partir de dados e exemplos.','Funciona sem dados ou programação.'],c:1,e:'O aprendizado de máquina identifica padrões a partir de dados e exemplos.'},
+{q:'4. No exemplo da entrada da escola, o estudante tem identificação válida e chegou no horário. Qual é a decisão prevista?',a:['Permitir a entrada.','Encaminhar automaticamente à coordenação.','Negar a entrada.'],c:0,e:'A condição definida foi: identificação válida e pontualidade permitem a entrada.'},
+{q:'5. Qual situação é um exemplo de IA no cotidiano?',a:['Um mapa que sugere rotas.','Um caderno sem recursos digitais.','Uma cadeira comum.'],c:0,e:'Aplicativos de mapas podem utilizar IA para analisar informações e sugerir trajetos.'},
+{q:'6. Quais podem ser benefícios da IA? (Marque a melhor alternativa)',a:['Agilizar tarefas, organizar informações e apoiar a aprendizagem.','Garantir que todas as respostas estejam corretas.','Eliminar a necessidade de decisões humanas.'],c:0,e:'A IA pode ajudar em tarefas, mas não garante respostas corretas nem elimina a responsabilidade humana.'},
+{q:'7. É possível criar um sistema que toma decisões seguindo regras definidas por pessoas?',a:['Sim.','Não.'],c:0,e:'Sim. Sistemas baseados em regras seguem condições e ações previamente programadas.'},
+{q:'8. A inteligência artificial sempre apresenta respostas corretas e não precisa de acompanhamento humano.',a:['Verdadeiro.','Falso.'],c:1,e:'Falso. Os resultados precisam ser conferidos e utilizados com responsabilidade.'}
+];
+let qi=0,score=0,answered=false;
+function renderQ(){answered=false;const q=questions[qi];document.getElementById('qtext').textContent=q.q;document.getElementById('feedback').textContent='';document.getElementById('qcount').textContent=`Pergunta ${qi+1} de ${questions.length} · Acertos: ${score}`;const box=document.getElementById('answers');box.innerHTML='';q.a.forEach((a,i)=>{let b=document.createElement('button');b.className='quiz-option';b.textContent=a;b.onclick=()=>{if(answered)return;answered=true;const ok=i===q.c;if(ok)score++;document.getElementById('feedback').textContent=(ok?'✓ Muito bem! ':'✗ Vamos aprender: ')+q.e;[...box.children].forEach((el,j)=>{el.disabled=true;if(j===q.c)el.style.borderColor='#54d6e8';if(j===i&&!ok)el.style.borderColor='#ff7aa2'});document.getElementById('qcount').textContent=`Pergunta ${qi+1} de ${questions.length} · Acertos: ${score}`};box.appendChild(b)});document.getElementById('nextq').textContent=qi===questions.length-1?'Ver resultado':'Próxima pergunta'}
+document.getElementById('nextq').onclick=()=>{if(!answered){document.getElementById('feedback').textContent='Escolha uma resposta antes de continuar.';return}if(qi<questions.length-1){qi++;renderQ()}else{document.getElementById('qtext').textContent=`Você concluiu o quiz! Acertou ${score} de ${questions.length} perguntas.`;document.getElementById('answers').innerHTML='';document.getElementById('feedback').textContent='Parabéns pela participação! Conversem sobre as respostas.';document.getElementById('qcount').textContent='Fim do quiz';document.getElementById('nextq').disabled=true}};
+document.getElementById('restart').onclick=()=>{qi=0;score=0;document.getElementById('nextq').disabled=false;renderQ()};
+renderQ();go(0);window.addEventListener('resize',()=>go(current));
+</script>
+</body>
+</html>
