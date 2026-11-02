@@ -4,389 +4,656 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#071426">
-<title>Inteligência Artificial que toma decisões seguindo regras | CPAN-UFMS</title>
+<title>IA que toma decisões seguindo regras | CPAN-UFMS</title>
 <style>
-:root{
-  --navy:#071426;--navy2:#0b1d33;--panel:#102944;--panel2:#153652;
-  --cyan:#55d8e8;--cyan2:#a1f1f4;--yellow:#ffd166;--white:#f5f8fc;
-  --muted:#b8c8d9;--line:rgba(176,218,239,.2);--pink:#ff8ca8;
-  --shadow:0 24px 70px rgba(0,0,0,.35);
+:root {
+  --navy: #071426;
+  --navy2: #0b1d33;
+  --panel: #102944;
+  --panel2: #153652;
+  --cyan: #55d8e8;
+  --cyan2: #a1f1f4;
+  --yellow: #ffd166;
+  --white: #f5f8fc;
+  --muted: #b8c8d9;
+  --line: rgba(176, 218, 239, 0.2);
+  --pink: #ff8ca8;
+  --shadow: 0 24px 70px rgba(0,0,0,0.35);
 }
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--white);
- background:radial-gradient(ellipse at 12% 10%,#143b5a 0,transparent 36%),
- radial-gradient(ellipse at 90% 85%,#192e50 0,transparent 34%),var(--navy)}
-button{font:inherit}
-#stage{position:fixed;inset:0;overflow:hidden;perspective:1200px}
-#world{position:absolute;inset:0;transform-origin:0 0;will-change:transform;transition:transform 1050ms cubic-bezier(.2,.75,.18,1)}
-.slide{
- position:absolute;width:1100px;height:650px;left:0;top:0;transform:translate(-50%,-50%);
- padding:58px 68px;border-radius:30px;border:1px solid rgba(167,224,244,.22);
- background:linear-gradient(140deg,rgba(17,43,68,.98),rgba(8,25,45,.98));
- box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center;gap:22px;
- overflow:hidden;opacity:.96
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  color: var(--white);
+  background: radial-gradient(ellipse at 12% 10%, #143b5a 0, transparent 36%),
+              radial-gradient(ellipse at 90% 85%, #192e50 0, transparent 34%),
+              var(--navy);
 }
-.slide:before{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(85,216,232,.12);
- border-radius:50%;right:-190px;top:-210px;box-shadow:0 0 0 35px rgba(85,216,232,.025),0 0 0 75px rgba(85,216,232,.02);pointer-events:none}
-.slide:after{content:"";position:absolute;width:180px;height:3px;background:var(--cyan);left:68px;top:0;opacity:.8}
-.slide>*{position:relative;z-index:1}
-.cover{background:radial-gradient(circle at 78% 45%,rgba(39,143,166,.28),transparent 30%),linear-gradient(135deg,#102d49,#08182b)}
-.cover:after{display:none}
-.kicker{color:var(--cyan);font-size:15px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-h1,h2,h3,p{margin:0}
-h1{font-size:66px;line-height:1.03;letter-spacing:-.045em;max-width:900px}
-h2{font-size:48px;line-height:1.08;letter-spacing:-.035em;max-width:940px}
-h3{font-size:22px;line-height:1.2}
-p{font-size:23px;line-height:1.45;color:var(--muted);max-width:930px}
-strong{color:var(--white)}
-.small{font-size:17px;line-height:1.45}
-.tiny{font-size:14px;line-height:1.4;color:#9db3c9}
-.presenter{position:absolute!important;top:26px;right:34px;color:#91abc3;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
-.slide-no{position:absolute!important;top:26px;left:34px;color:#819bb5;font-size:13px;letter-spacing:.08em}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-.tile{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:19px;padding:21px;min-height:130px}
-.tile .ico{font-size:34px;margin-bottom:12px;display:block}
-.tile h3{color:var(--yellow);margin-bottom:8px}
-.tile p{font-size:17px;line-height:1.38}
-.pill{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(85,216,232,.35);background:rgba(85,216,232,.08);
- color:var(--cyan2);padding:10px 15px;border-radius:999px;font-size:16px;font-weight:700}
-.rule-list{display:grid;gap:12px}
-.rule{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.055);border-left:5px solid var(--cyan);font-size:22px;line-height:1.35}
-.rule b{color:var(--yellow)}
-.flow{display:flex;align-items:center;justify-content:center;gap:15px;flex-wrap:nowrap}
-.flowbox{width:190px;min-height:135px;padding:17px;border:1px solid rgba(85,216,232,.35);background:rgba(85,216,232,.07);
- border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;font-weight:750;font-size:18px}
-.flowbox span{font-size:35px}
-.flowarrow{font-size:32px;color:var(--yellow)}
-.center{text-align:center;align-items:center}
-.center p{margin-inline:auto}
-.cover-layout{display:grid;grid-template-columns:1.4fr .8fr;gap:35px;align-items:center}
-.cover h1{font-size:61px}
-.cover .meta{font-size:19px;color:var(--muted);line-height:1.55}
-.people{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin-top:8px}
-.person{padding:9px 0;border-bottom:1px solid var(--line);font-size:16px;color:#e5edf5}
-.ai-orbit{height:330px;width:330px;border-radius:50%;border:1px solid rgba(85,216,232,.35);margin:auto;position:relative;
- display:grid;place-items:center;background:radial-gradient(circle,rgba(85,216,232,.18),rgba(85,216,232,.02) 58%,transparent 60%)}
-.ai-core{height:142px;width:142px;border-radius:50%;display:grid;place-items:center;background:#164b68;border:1px solid var(--cyan);font-size:58px;box-shadow:0 0 55px rgba(85,216,232,.2)}
-.orbit-node{position:absolute;border-radius:50%;width:62px;height:62px;display:grid;place-items:center;background:#193b58;border:1px solid var(--line);font-size:27px}
-.n1{top:0;left:130px}.n2{right:0;top:130px}.n3{bottom:0;left:130px}.n4{left:0;top:130px}
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.compare .tile{min-height:185px}
-.compare h3{font-size:25px}
-.compare .tag{font-size:13px;color:var(--cyan);font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
-.quote{font-size:29px;line-height:1.35;color:var(--white);font-weight:650;border-left:4px solid var(--yellow);padding-left:24px;max-width:900px}
-.reference{font-size:14px;line-height:1.45;color:#a9bdd0;overflow-wrap:anywhere}
-.reference a{color:var(--cyan2)}
-#hud{position:fixed;z-index:20;left:50%;bottom:20px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;
- padding:9px 11px;border:1px solid rgba(255,255,255,.15);border-radius:999px;background:rgba(4,14,27,.88);backdrop-filter:blur(14px)}
-#hud button,.modal button{border:1px solid rgba(255,255,255,.12);background:#173b59;color:var(--white);padding:10px 15px;border-radius:999px;cursor:pointer;font-weight:700}
-#hud button:hover,.modal button:hover{background:#245779}
-#hud button:disabled{opacity:.35;cursor:not-allowed}
-#hud .primary,.modal .primary{background:var(--cyan);color:#052033;border-color:transparent}
-#counter{font-size:13px;color:#c3d4e5;min-width:58px;text-align:center}
-#progress{position:fixed;z-index:25;top:0;left:0;height:4px;width:0;background:var(--cyan);transition:width .35s}
-#hint{position:fixed;right:22px;bottom:27px;color:#8fa7bf;font-size:12px}
-.modal{position:fixed;z-index:40;inset:0;background:rgba(2,9,18,.94);display:none;overflow:auto;padding:5vh 5vw}
-.modal.open{display:block}
-.modal h2{font-size:34px;margin-bottom:8px}
-.modal p{font-size:16px}
-.mapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:13px;margin:24px 0}
-.mapitem{min-height:115px;text-align:left!important;border-radius:16px!important;padding:18px!important;background:#102944!important}
-.mapitem small{display:block;color:var(--cyan);margin-bottom:9px}
-.mapitem strong{font-size:17px}
-.notes-panel{position:fixed;z-index:30;right:18px;top:18px;width:min(390px,calc(100vw - 36px));max-height:65vh;overflow:auto;
- display:none;padding:18px;border-radius:18px;border:1px solid var(--line);background:rgba(5,18,33,.97);box-shadow:var(--shadow)}
-.notes-panel.open{display:block}
-.notes-panel h3{margin-bottom:10px;color:var(--cyan)}
-.notes-panel p{font-size:15px}
-.quiz-question{font-size:24px;color:var(--white);max-width:900px}
-.quiz-options{display:grid;gap:10px;max-width:900px;width:100%}
-.quiz-option{width:100%;text-align:left;border-radius:14px!important;padding:15px 18px!important;background:rgba(255,255,255,.07)!important}
-.quiz-option.correct{border-color:var(--cyan)!important;background:rgba(85,216,232,.14)!important}
-.quiz-option.wrong{border-color:var(--pink)!important}
-#quiz-feedback{min-height:45px;color:var(--yellow);font-size:17px;line-height:1.4}
-@media(max-width:760px){
- #hud{bottom:9px;gap:4px;padding:7px}#hud button{padding:9px 10px;font-size:12px}#hint{display:none}
- .slide{padding:35px 30px}.cover-layout{grid-template-columns:1fr}.cover .ai-orbit{display:none}
+
+button { font: inherit; }
+
+#stage { position: fixed; inset: 0; overflow: hidden; perspective: 1200px; }
+#world { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; transition: transform 1050ms cubic-bezier(0.2, 0.75, 0.18, 1); }
+
+.slide {
+  position: absolute; width: 1100px; height: 650px; left: 0; top: 0; transform: translate(-50%, -50%);
+  padding: 50px 60px; border-radius: 30px; border: 1px solid rgba(167, 224, 244, 0.22);
+  background: linear-gradient(140deg, rgba(17, 43, 68, 0.98), rgba(8, 25, 45, 0.98));
+  box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; gap: 18px;
+  overflow: hidden; opacity: 0.96;
 }
-@media(prefers-reduced-motion:reduce){#world{transition:none}}
+
+.slide::before {
+  content: ""; position: absolute; width: 420px; height: 420px; border: 1px solid rgba(85, 216, 232, 0.12);
+  border-radius: 50%; right: -190px; top: -210px; box-shadow: 0 0 0 35px rgba(85, 216, 232, 0.025), 0 0 0 75px rgba(85, 216, 232, 0.02); pointer-events: none;
+}
+.slide::after { content: ""; position: absolute; width: 180px; height: 3px; background: var(--cyan); left: 60px; top: 0; opacity: 0.8; }
+.slide > * { position: relative; z-index: 1; }
+
+.cover { background: radial-gradient(circle at 78% 45%, rgba(39, 143, 166, 0.28), transparent 30%), linear-gradient(135deg, #102d49, #08182b); }
+.cover::after { display: none; }
+
+.kicker { color: var(--cyan); font-size: 14px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 54px; line-height: 1.05; letter-spacing: -0.04em; max-width: 900px; }
+h2 { font-size: 42px; line-height: 1.1; letter-spacing: -0.03em; max-width: 940px; color: var(--white); }
+h3 { font-size: 20px; line-height: 1.25; }
+p { font-size: 20px; line-height: 1.45; color: var(--muted); max-width: 930px; }
+strong { color: var(--white); }
+.small { font-size: 16px; line-height: 1.4; }
+.tiny { font-size: 13px; line-height: 1.35; color: #9db3c9; }
+
+.presenter { position: absolute !important; top: 22px; right: 30px; color: #91abc3; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.slide-no { position: absolute !important; top: 22px; left: 30px; color: #819bb5; font-size: 12px; letter-spacing: 0.08em; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.tile { background: rgba(255, 255, 255, 0.055); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-height: 110px; }
+.tile .ico { font-size: 28px; margin-bottom: 8px; display: block; }
+.tile h3 { color: var(--yellow); margin-bottom: 6px; }
+.tile p { font-size: 15px; line-height: 1.35; }
+
+.pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(85, 216, 232, 0.35); background: rgba(85, 216, 232, 0.08); color: var(--cyan2); padding: 8px 14px; border-radius: 999px; font-size: 15px; font-weight: 700; width: fit-content; }
+
+.rule-list { display: grid; gap: 10px; }
+.rule { padding: 14px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.055); border-left: 5px solid var(--cyan); font-size: 19px; line-height: 1.35; }
+.rule b { color: var(--yellow); }
+
+.flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: nowrap; }
+.flowbox { width: 170px; min-height: 115px; padding: 14px; border: 1px solid rgba(85, 216, 232, 0.35); background: rgba(85, 216, 232, 0.07); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; font-weight: 700; font-size: 16px; }
+.flowbox span { font-size: 30px; }
+.flowarrow { font-size: 26px; color: var(--yellow); }
+
+.cover-layout { display: grid; grid-template-columns: 1.3fr 0.8fr; gap: 30px; align-items: center; }
+.cover h1 { font-size: 50px; }
+.cover .meta { font-size: 17px; color: var(--muted); line-height: 1.5; }
+.people { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 15px; margin-top: 6px; }
+.person { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: #e5edf5; }
+
+.ai-orbit { height: 290px; width: 290px; border-radius: 50%; border: 1px solid rgba(85, 216, 232, 0.35); margin: auto; position: relative; display: grid; place-items: center; background: radial-gradient(circle, rgba(85, 216, 232, 0.18), rgba(85, 216, 232, 0.02) 58%, transparent 60%); }
+.ai-core { height: 120px; width: 120px; border-radius: 50%; display: grid; place-items: center; background: #164b68; border: 1px solid var(--cyan); font-size: 46px; box-shadow: 0 0 45px rgba(85, 216, 232, 0.2); }
+.orbit-node { position: absolute; border-radius: 50%; width: 52px; height: 52px; display: grid; place-items: center; background: #193b58; border: 1px solid var(--line); font-size: 22px; }
+.n1 { top: 0; left: 119px; } .n2 { right: 0; top: 119px; } .n3 { bottom: 0; left: 119px; } .n4 { left: 0; top: 119px; }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare .tile { min-height: 160px; }
+.compare h3 { font-size: 22px; }
+.compare .tag { font-size: 12px; color: var(--cyan); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+
+.quote { font-size: 24px; line-height: 1.35; color: var(--white); font-weight: 600; border-left: 4px solid var(--yellow); padding-left: 20px; max-width: 900px; }
+.reference { font-size: 13px; line-height: 1.45; color: #a9bdd0; overflow-wrap: anywhere; }
+.reference a { color: var(--cyan2); }
+
+/* Simulador Interativo */
+.sim-container { background: rgba(10, 30, 52, 0.9); border: 1px solid var(--cyan); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
+.sim-controls { display: flex; flex-direction: column; gap: 10px; }
+.sim-controls label { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; }
+.sim-controls input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--cyan); }
+.sim-output { background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 15px; border: 1px solid var(--line); font-family: monospace; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
+.sim-log { color: var(--yellow); min-height: 50px; }
+.sim-diag { color: var(--cyan2); font-weight: bold; font-size: 16px; border-top: 1px dashed var(--line); padding-top: 8px; }
+
+/* HUD e Modais */
+#hud { position: fixed; z-index: 20; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; background: rgba(4,14,27,0.88); backdrop-filter: blur(14px); }
+#hud button, .modal button { border: 1px solid rgba(255,255,255,0.12); background: #173b59; color: var(--white); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px; }
+#hud button:hover, .modal button:hover { background: #245779; }
+#hud button:disabled { opacity: 0.35; cursor: not-allowed; }
+#hud .primary, .modal .primary { background: var(--cyan); color: #052033; border-color: transparent; }
+
+#counter { font-size: 13px; color: #c3d4e5; min-width: 65px; text-align: center; }
+#progress { position: fixed; z-index: 25; top: 0; left: 0; height: 4px; width: 0; background: var(--cyan); transition: width 0.35s; }
+#hint { position: fixed; right: 22px; bottom: 27px; color: #8fa7bf; font-size: 12px; }
+
+.modal { position: fixed; z-index: 40; inset: 0; background: rgba(2,9,18,0.95); display: none; overflow: auto; padding: 5vh 5vw; }
+.modal.open { display: block; }
+.modal h2 { font-size: 32px; margin-bottom: 8px; }
+.modal p { font-size: 15px; }
+
+.mapgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 20px 0; }
+.mapitem { min-height: 100px; text-align: left !important; border-radius: 14px !important; padding: 14px !important; background: #102944 !important; }
+.mapitem small { display: block; color: var(--cyan); margin-bottom: 6px; }
+.mapitem strong { font-size: 15px; }
+
+.notes-panel { position: fixed; z-index: 30; right: 18px; top: 18px; width: min(390px, calc(100vw - 36px)); max-height: 65vh; overflow: auto; display: none; padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(5,18,33,0.97); box-shadow: var(--shadow); }
+.notes-panel.open { display: block; }
+.notes-panel h3 { margin-bottom: 10px; color: var(--cyan); }
+.notes-panel p { font-size: 14px; line-height: 1.4; }
+
+/* Estilos do Quiz Atualizados */
+.quiz-options { display: grid; gap: 10px; max-width: 900px; width: 100%; margin-top: 10px; }
+.quiz-option { width: 100%; text-align: left; border-radius: 12px !important; padding: 12px 16px !important; background: rgba(255,255,255,0.07) !important; font-size: 16px; border: 1px solid var(--line); color: var(--white) !important; cursor: pointer; }
+.quiz-option.correct { border-color: var(--cyan) !important; color: var(--yellow) !important; background: rgba(85,216,232,0.15) !important; font-weight: bold; }
+.quiz-option.wrong { border-color: var(--pink) !important; color: var(--yellow) !important; background: rgba(255,140,168,0.15) !important; font-weight: bold; }
+#quiz-feedback { min-height: 35px; color: var(--yellow); font-size: 16px; font-weight: 600; margin-top: 10px; }
+
+@media (max-width: 760px) {
+  #hud { bottom: 9px; gap: 4px; padding: 6px; } #hud button { padding: 7px 9px; font-size: 11px; } #hint { display: none; }
+  .slide { padding: 30px 24px; width: 95vw; height: 85vh; } .cover-layout { grid-template-columns: 1fr; } .cover .ai-orbit { display: none; }
+  .sim-container { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { #world { transition: none; } }
 </style>
 </head>
 <body>
-<div id="progress"></div>
-<div id="stage"><main id="world">
 
-<section class="slide cover" data-title="Capa" data-presenter="Todos os acadêmicos" data-notes="Apresentem o tema, a disciplina, o professor e os integrantes do grupo. Expliquem brevemente que a apresentação vai mostrar como sistemas computacionais podem tomar decisões seguindo regras.">
- <div class="slide-no">CPAN · UFMS</div>
+<div id="progress"></div>
+
+<div id="stage">
+<main id="world">
+
+<!-- SLIDE 1: Capa -->
+<section class="slide cover" data-title="Capa" data-presenter="Todos os Acadêmicos" data-notes="Apresentem o tema do seminário, os participantes, a disciplina e o professor Gilberto Xavier Loio. Expliquem que o trabalho aborda a tomada de decisão em IA usando regras lógicas explícitas e suas implicações éticas.">
+ <div class="slide-no">CPAN · UFMS · Slide 01/23</div>
  <div class="cover-layout">
   <div>
-   <div class="kicker">Introdução à Computação</div>
-   <h1>Inteligência artificial que toma decisões seguindo regras</h1>
-   <p class="meta" style="margin-top:18px">Professor Gilberto Xavier Loio<br>Curso Licenciatura em Computação<br>CPAN-UFMS</p>
-   <div class="kicker" style="margin-top:24px">Acadêmicos</div>
+   <div class="kicker">Introdução à Computação · Licenciatura</div>
+   <h1>Inteligência Artificial que Toma Decisões Seguindo Regras</h1>
+   <p class="meta" style="margin-top:14px">Professor Gilberto Xavier Loio<br>Curso de Licenciatura em Computação — CPAN-UFMS</p>
+   <div class="kicker" style="margin-top:18px">Acadêmicos</div>
    <div class="people">
-    <div class="person">Moisés Lopes</div><div class="person">Soraia Miranda</div>
-    <div class="person">Wellington Oliveira</div><div class="person">Jesiel da Silva</div>
-    <div class="person">Mariestala Lima</div><div class="person">Veronica Belmonte</div>
+    <div class="person">Moisés Lopes</div><div class="person">Jesiel da Silva</div>
+    <div class="person">Wellington Oliveira</div><div class="person">Soraia Miranda</div>
+    <div class="person">Mariestela Lima</div><div class="person">Veronica Belmonte</div>
     <div class="person">Glaucio da Silva</div>
    </div>
   </div>
-  <div class="ai-orbit"><div class="ai-core">IA</div><div class="orbit-node n1">⚙️</div><div class="orbit-node n2">↗</div><div class="orbit-node n3">⌘</div><div class="orbit-node n4">◇</div></div>
+  <div class="ai-orbit"><div class="ai-core">IA</div><div class="orbit-node n1">⚙️</div><div class="orbit-node n2">IF</div><div class="orbit-node n3">THEN</div><div class="orbit-node n4">◇</div></div>
  </div>
 </section>
 
-<section class="slide" data-title="A inteligência artificial está em toda parte" data-presenter="Moisés Lopes · Introdução" data-notes="Comece perguntando quem já utilizou um mapa no celular, recebeu recomendações de vídeos ou conversou com um assistente virtual. Explique que muitas dessas ferramentas utilizam técnicas de inteligência artificial.">
- <div class="slide-no">02 / 15</div><div class="presenter">Moisés Lopes · Introdução</div>
- <div class="kicker">Abertura</div><h2>A inteligência artificial está em toda parte</h2>
- <p>Ela aparece em ferramentas que usamos para conversar, encontrar caminhos e descobrir conteúdos.</p>
+<!-- SLIDE 2: Tema 1 - Introdução (Moisés) -->
+<section class="slide" data-title="Introdução & Origens da IA" data-presenter="Moisés Lopes · Slide 1/3" data-notes="Moisés: Apresentar o nascimento da IA na Conferência de Dartmouth (1956) com McCarthy, Minsky, Rochester e Shannon. Destacar a busca inicial por simular capacidades humanas via computação.">
+ <div class="slide-no">02 / 23</div><div class="presenter">Moisés Lopes · Introdução (1/3)</div>
+ <div class="kicker">Tema 1 · Introdução</div><h2>As Origens da Inteligência Artificial</h2>
+ <p>Formalizada em 1956 na Conferência de Dartmouth, a IA nasceu do objetivo de criar máquinas capazes de realizar tarefas que exigem inteligência humana.</p>
  <div class="grid">
-  <div class="tile"><span class="ico">💬</span><h3>Chatbots</h3><p>Respondem perguntas e auxiliam em tarefas.</p></div>
-  <div class="tile"><span class="ico">🗺️</span><h3>Aplicativos de mapas</h3><p>Analisam informações e sugerem trajetos.</p></div>
-  <div class="tile"><span class="ico">🎬</span><h3>Recomendações</h3><p>Sugerem vídeos, músicas e outros conteúdos.</p></div>
+  <div class="tile"><span class="ico">🏛️</span><h3>Dartmouth (1956)</h3><p>Termo cunhado por John McCarthy, Marvin Minsky, Nathaniel Rochester e Claude Shannon.</p></div>
+  <div class="tile"><span class="ico">💻</span><h3>Ciência Computacional</h3><p>Subárea dedicada a simular a capacidade de pensar, raciocinar e agir.</p></div>
+  <div class="tile"><span class="ico">🔍</span><h3>Resolução de Problemas</h3><p>Métodos computacionais para superar limitações da computação convencional.</p></div>
  </div>
 </section>
 
-<section class="slide" data-title="Como uma máquina pode tomar decisões?" data-presenter="Moisés Lopes · Introdução" data-notes="Apresente a pergunta central. Explique que nem todo sistema toma decisões da mesma maneira. Alguns seguem regras programadas, outros aprendem padrões com dados e há sistemas que combinam abordagens.">
- <div class="slide-no">03 / 15</div><div class="presenter">Moisés Lopes · Introdução</div>
- <div class="kicker">A pergunta central</div><h2>Como uma máquina pode tomar decisões?</h2>
- <p>Um sistema computacional pode chegar a uma decisão por diferentes caminhos.</p>
- <div class="flow">
-  <div class="flowbox"><span>📋</span>Seguindo regras</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>📊</span>Identificando padrões</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>🔀</span>Combinando técnicas</div>
- </div>
- <div class="pill">Vamos entender como isso funciona?</div>
-</section>
-
-<section class="slide" data-title="Afinal, o que é inteligência artificial?" data-presenter="Soraia Miranda · O que é IA" data-notes="Defina IA como uma área da computação que desenvolve sistemas capazes de executar tarefas associadas a habilidades inteligentes. Dê exemplos: reconhecer imagens, interpretar voz, identificar padrões e apoiar decisões.">
- <div class="slide-no">04 / 15</div><div class="presenter">Soraia Miranda · O que é IA</div>
- <div class="kicker">Conceito</div><h2>Afinal, o que é inteligência artificial?</h2>
- <p>É uma área da computação que desenvolve sistemas capazes de realizar tarefas associadas à inteligência, como reconhecer informações, identificar padrões e apoiar decisões.</p>
+<!-- SLIDE 3: Tema 1 - As 4 Abordagens Clássicas (Moisés) -->
+<section class="slide" data-title="As 4 Abordagens da IA" data-presenter="Moisés Lopes · Slide 2/3" data-notes="Moisés: Detalhar a classificação clássica de Russell & Norvig. Explicar a diferença entre focar no comportamento humano (Teste de Turing) e na racionalidade perfeita (Lógica formal).">
+ <div class="slide-no">03 / 23</div><div class="presenter">Moisés Lopes · Introdução (2/3)</div>
+ <div class="kicker">Tema 1 · Conceituação</div><h2>As 4 Abordagens Clássicas da IA</h2>
+ <p>Segundo Russell & Norvig, os sistemas inteligentes dividem-se em quatro perspectivas fundamentais:</p>
  <div class="grid four">
-  <div class="tile"><span class="ico">👁️</span><h3>Reconhecer</h3><p>Imagens e sons.</p></div>
-  <div class="tile"><span class="ico">🔎</span><h3>Identificar</h3><p>Padrões e relações.</p></div>
-  <div class="tile"><span class="ico">💬</span><h3>Interpretar</h3><p>Textos e comandos.</p></div>
-  <div class="tile"><span class="ico">🧭</span><h3>Apoiar</h3><p>Decisões e tarefas.</p></div>
+  <div class="tile"><span class="ico">🧠</span><h3>Pensar como Humanos</h3><p>Simulação de modelos cognitivos e biológicos do cérebro.</p></div>
+  <div class="tile"><span class="ico">🗣️</span><h3>Agir como Humanos</h3><p>Comportamento indistinguível do humano (Teste de Turing, 1950).</p></div>
+  <div class="tile"><span class="ico">⚖️</span><h3>Pensar Racionalmente</h3><p>Lógica formal, lemas indubitáveis e leis do pensamento.</p></div>
+  <div class="tile"><span class="ico">🎯</span><h3>Agir Racionalmente</h3><p>Agentes inteligentes que agem para maximizar seus objetivos.</p></div>
  </div>
 </section>
 
-<section class="slide" data-title="Como a IA realiza essas tarefas?" data-presenter="Soraia Miranda · O que é IA" data-notes="Mostre que os sistemas recebem dados de entrada, processam essas informações e produzem uma saída. Ressalte que há diferentes técnicas: regras programadas e modelos que identificam padrões a partir de exemplos.">
- <div class="slide-no">05 / 15</div><div class="presenter">Soraia Miranda · O que é IA</div>
- <div class="kicker">Funcionamento</div><h2>Como a IA realiza essas tarefas?</h2>
- <p>De forma simplificada, um sistema recebe informações, processa os dados e apresenta um resultado.</p>
- <div class="flow">
-  <div class="flowbox"><span>📥</span>Entrada<br><small>Imagem, voz ou texto</small></div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>⚙️</span>Processamento<br><small>Regras ou modelos</small></div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>📤</span>Resultado<br><small>Resposta ou ação</small></div>
- </div>
- <p class="small">Nem todos os sistemas utilizam a mesma técnica para chegar ao resultado.</p>
-</section>
-
-<section class="slide" data-title="Quem define as regras que orientam uma decisão?" data-presenter="Wellington Oliveira · Regras" data-notes="Explique que, em um sistema baseado em regras, pessoas definem condições e ações. Leia os exemplos do semáforo. A estrutura SE... ENTÃO ajuda a transformar uma situação em uma instrução que o programa pode executar.">
- <div class="slide-no">06 / 15</div><div class="presenter">Wellington Oliveira · Regras</div>
- <div class="kicker">Decisões baseadas em regras</div><h2>Quem define as regras que orientam uma decisão?</h2>
- <p>As pessoas podem programar condições para que o computador execute ações específicas.</p>
- <div class="rule-list">
-  <div class="rule">SE o sinal estiver <b>vermelho</b>, ENTÃO pare.</div>
-  <div class="rule">SE o sinal estiver <b>verde</b>, ENTÃO siga.</div>
-  <div class="rule">SE o sinal estiver <b>amarelo</b>, ENTÃO tenha atenção.</div>
- </div>
- <div class="pill">SE acontecer uma condição → ENTÃO execute uma ação</div>
-</section>
-
-<section class="slide" data-title="As regras na prática: entrada da escola" data-presenter="Wellington Oliveira · Regras" data-notes="Apresente o exemplo como uma simulação didática, não como uma regra real da escola. Explique que o sistema recebe informações, verifica as condições programadas e produz uma decisão. Comente que regras incompletas ou injustas podem gerar resultados inadequados.">
- <div class="slide-no">07 / 15</div><div class="presenter">Wellington Oliveira · Regras</div>
- <div class="kicker">Exemplo prático</div><h2>As regras na prática: entrada da escola</h2>
- <div class="rule-list">
-  <div class="rule">SE possui identificação válida <b>e</b> chegou no horário, ENTÃO permita a entrada.</div>
-  <div class="rule">SE não possui identificação, ENTÃO encaminhe para verificação.</div>
-  <div class="rule">SE chegou atrasado, ENTÃO solicite autorização.</div>
- </div>
- <div class="flow">
-  <div class="flowbox"><span>📥</span>Entrada de dados</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>⚙️</span>Verificação</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>📤</span>Decisão</div>
- </div>
- <p class="tiny">A qualidade da decisão depende também da qualidade das regras definidas.</p>
-</section>
-
-<section class="slide" data-title="Toda IA precisa aprender?" data-presenter="Jesiel da Silva · Aprendizado de máquina" data-notes="Responda diretamente: não. Explique que sistemas baseados em regras executam condições previamente definidas. Já o aprendizado de máquina utiliza dados e exemplos para identificar padrões. Evite afirmar que todo sistema baseado em regras é necessariamente IA; o ponto é que regras também podem compor sistemas inteligentes.">
- <div class="slide-no">08 / 15</div><div class="presenter">Jesiel da Silva · Aprendizado de máquina</div>
- <div class="kicker">Uma distinção importante</div><h2>Toda inteligência artificial precisa aprender?</h2>
- <p><strong>Não.</strong> Existem sistemas que utilizam regras definidas por pessoas, sem aprender a partir de grandes conjuntos de dados.</p>
+<!-- SLIDE 4: Tema 1 - IA Generativa vs Preditiva (Moisés) -->
+<section class="slide" data-title="IA Generativa vs Preditiva" data-presenter="Moisés Lopes · Slide 3/3" data-notes="Moisés: Diferenciar a IA Preditiva (que analisa dados passados para prever resultados ou classificar) da IA Generativa (que cria novos conteúdos como textos e imagens via estatística computacional).">
+ <div class="slide-no">04 / 23</div><div class="presenter">Moisés Lopes · Introdução (3/3)</div>
+ <div class="kicker">Tema 1 · O que é IA</div><h2>IA Generativa vs. IA Preditiva</h2>
+ <p>No cenário contemporâneo, as ferramentas de IA dividem-se em dois grandes paradigmas funcionais:</p>
  <div class="compare">
-  <div class="tile"><div class="tag">Abordagem 1</div><h3>📋 Sistemas baseados em regras</h3><p>Seguem instruções e condições previamente programadas.</p></div>
-  <div class="tile"><div class="tag">Abordagem 2</div><h3>📈 Aprendizado de máquina</h3><p>Identifica padrões a partir de dados e exemplos.</p></div>
+  <div class="tile"><div class="tag">IA Preditiva</div><span class="ico">📈</span><h3>Análise e Classificação</h3><p>Estima probabilidades, detecta fraudes bancárias e antecipa tendências com base em dados históricos acumulados.</p></div>
+  <div class="tile"><div class="tag">IA Generativa</div><span class="ico">🎨</span><h3>Criação de Conteúdo</h3><p>Modelos de linguagem (LLMs) e difusão criam textos, sintaxe de código, imagens e áudios originais a partir de padrões estatísticos.</p></div>
  </div>
 </section>
 
-<section class="slide" data-title="Regras programadas ou aprendizado de máquina?" data-presenter="Jesiel da Silva · Aprendizado de máquina" data-notes="Compare os exemplos. No jogo, as regras de vitória podem ser programadas diretamente. No reconhecimento de frutas, um modelo pode ser treinado com muitas imagens para aprender características. Explique que são exemplos simplificados para visualizar a diferença.">
- <div class="slide-no">09 / 15</div><div class="presenter">Jesiel da Silva · Aprendizado de máquina</div>
- <div class="kicker">Comparando exemplos</div><h2>Regras programadas ou aprendizado de máquina?</h2>
- <div class="compare">
-  <div class="tile"><div class="tag">Regras programadas</div><span class="ico">✊ ✋ ✌️</span><h3>Pedra, papel e tesoura</h3><p>O programa pode seguir regras definidas para determinar quem vence cada rodada.</p></div>
-  <div class="tile"><div class="tag">Aprendizado de máquina</div><span class="ico">🍎 🍌 🍊</span><h3>Reconhecimento de frutas</h3><p>Um modelo pode analisar muitas imagens e identificar padrões para diferenciar frutas.</p></div>
- </div>
- <p class="small"><strong>Em resumo:</strong> regras seguem condições definidas; aprendizado de máquina identifica padrões nos dados.</p>
-</section>
-
-<section class="slide" data-title="Onde encontramos a inteligência artificial?" data-presenter="Mariestala Lima · IA no cotidiano" data-notes="Peça que a turma reconheça quais exemplos já utiliza. Explique que a presença de IA varia conforme o aplicativo e o recurso; nem toda função de um celular ou aplicativo utiliza IA.">
- <div class="slide-no">10 / 15</div><div class="presenter">Mariestela Lima · IA no cotidiano</div>
- <div class="kicker">No dia a dia</div><h2>Onde encontramos a inteligência artificial?</h2>
- <div class="grid four">
-  <div class="tile"><span class="ico">📱</span><h3>Celulares</h3><p>Reconhecimento facial e assistentes.</p></div>
-  <div class="tile"><span class="ico">🎧</span><h3>Entretenimento</h3><p>Sugestões de músicas e vídeos.</p></div>
-  <div class="tile"><span class="ico">🚗</span><h3>Transporte</h3><p>Rotas e informações de trânsito.</p></div>
-  <div class="tile"><span class="ico">🌎</span><h3>Comunicação</h3><p>Tradução e reconhecimento de voz.</p></div>
-  <div class="tile"><span class="ico">📚</span><h3>Educação</h3><p>Ferramentas de apoio ao estudo.</p></div>
-  <div class="tile"><span class="ico">🛍️</span><h3>Compras</h3><p>Recomendações de produtos.</p></div>
-  <div class="tile"><span class="ico">🏠</span><h3>Casa conectada</h3><p>Assistentes e automação.</p></div>
-  <div class="tile"><span class="ico">🧑‍🦯</span><h3>Acessibilidade</h3><p>Leitura, descrição e transcrição.</p></div>
- </div>
-</section>
-
-<section class="slide" data-title="A IA está presente em diferentes momentos" data-presenter="Mariestala Lima · IA no cotidiano" data-notes="Conte uma pequena história de um dia comum. Mostre que diferentes ferramentas podem utilizar IA em momentos distintos. Pergunte à turma qual desses recursos utiliza com mais frequência.">
- <div class="slide-no">11 / 15</div><div class="presenter">Mariestela Lima · IA no cotidiano</div>
- <div class="kicker">Um dia conectado</div><h2>A IA está presente em diferentes momentos</h2>
+<!-- SLIDE 5: Tema 2 - IA Simbólica (Jesiel) -->
+<section class="slide" data-title="Tomada de Decisão com Regras (IA Simbólica)" data-presenter="Jesiel da Silva · IA Simbólica (1/3)" data-notes="Jesiel: Introduzir a IA Simbólica ou GOFAI (Good Old-Fashioned AI). Explicar que a inteligência é representada através da manipulação explícita de símbolos e regras declarativas programadas por humanos.">
+ <div class="slide-no">05 / 23</div><div class="presenter">Jesiel da Silva · IA Simbólica (1/3)</div>
+ <div class="kicker">Tema 2 · IA Simbólica</div><h2>Tomada de Decisão por Regras Declarativas</h2>
+ <p>A <strong>IA Simbólica</strong> (ou IA Clássica) traduz o conhecimento especialista de humanos em símbolos e estruturas lógicas explícitas, sem depender de aprendizado de dados brutos.</p>
  <div class="flow">
-  <div class="flowbox"><span>📱</span>Desbloqueia o celular</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>🗺️</span>Consulta uma rota</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>🎬</span>Recebe sugestões</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>🌎</span>Traduz uma frase</div>
+  <div class="flowbox"><span>👤</span>Especialista Humano</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>📝</span>Estrutura SE-ENTÃO</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>⚙️</span>Motor de Inferência</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>🎯</span>Decisão Determinística</div>
  </div>
- <p class="quote">Quantas dessas ferramentas você já utilizou hoje?</p>
+ <div class="pill" style="margin-top:10px;">Conhecimento auditável e 100% transparente para verificação</div>
 </section>
 
-<section class="slide" data-title="Como a IA facilita nossa vida?" data-presenter="Veronica Belmonte · Como nos ajuda" data-notes="Explique os benefícios com exemplos próximos à realidade dos estudantes. Reforce que a IA pode apoiar profissionais e usuários, mas não substitui automaticamente o julgamento e a responsabilidade das pessoas.">
- <div class="slide-no">12 / 15</div><div class="presenter">Veronica Belmonte · Como nos ajuda</div>
- <div class="kicker">Benefícios</div><h2>Como a inteligência artificial facilita nossa vida?</h2>
+<!-- SLIDE 6: Tema 2 - Arquitetura dos Sistemas Especialistas (Jesiel) -->
+<section class="slide" data-title="Arquitetura de Sistemas Especialistas" data-presenter="Jesiel da Silva · IA Simbólica (2/3)" data-notes="Jesiel: Detalhar a estrutura dos Sistemas Especialistas: Base de Conhecimento (Regras), Motor de Inferência (Cadeia para frente/trás) e Interface de Explicação. Citar o exemplo histórico do MYCIN (1970).">
+ <div class="slide-no">06 / 23</div><div class="presenter">Jesiel da Silva · IA Simbólica (2/3)</div>
+ <div class="kicker">Tema 2 · Arquitetura</div><h2>Anatomia de um Sistema Especialista</h2>
  <div class="grid">
-  <div class="tile"><span class="ico">📚</span><h3>Educação</h3><p>Apoia estudos e organização de informações.</p></div>
-  <div class="tile"><span class="ico">🩺</span><h3>Saúde</h3><p>Pode auxiliar na análise de exames e dados.</p></div>
-  <div class="tile"><span class="ico">🚌</span><h3>Transporte</h3><p>Ajuda a planejar trajetos.</p></div>
-  <div class="tile"><span class="ico">💬</span><h3>Comunicação</h3><p>Facilita traduções e interações.</p></div>
-  <div class="tile"><span class="ico">♿</span><h3>Acessibilidade</h3><p>Oferece recursos de leitura e transcrição.</p></div>
-  <div class="tile"><span class="ico">⏱️</span><h3>Organização</h3><p>Agiliza tarefas e processos.</p></div>
+  <div class="tile"><span class="ico">📚</span><h3>Base de Conhecimento</h3><p>Conjunto de fatos e regras de especialistas codificados como <b>SE (Condição) ENTÃO (Ação)</b>.</p></div>
+  <div class="tile"><span class="ico">⚙️</span><h3>Motor de Inferência</h3><p>Algoritmo lógico que navega pelas regras deduzindo novas conclusões e respostas.</p></div>
+  <div class="tile"><span class="ico">💬</span><h3>Interface de Explicação</h3><p>Mecanismo que rastreia e mostra exatamente o caminho lógico percorrido até o diagnóstico.</p></div>
+ </div>
+ <p class="tiny" style="margin-top:6px;"><strong>Exemplo Histórico:</strong> O sistema <em>MYCIN</em> (década de 1970) utilizava mais de 450 regras lógicas para diagnosticar infecções bacterianas no sangue com taxa de acerto comparável a especialistas.</p>
+</section>
+
+<!-- SLIDE 7: Tema 2 - Demonstração Prática Interativa (Jesiel) -->
+<section class="slide" data-title="Demonstração Prática Interativa" data-presenter="Jesiel da Silva · IA Simbólica (3/3)" data-notes="Jesiel: Executar a demonstração ao vivo do simulador médico em JS. Marcar as opções e mostrar a lógica SE-ENTÃO processando as entradas em tempo real para produzir o diagnóstico final.">
+ <div class="slide-no">07 / 23</div><div class="presenter">Jesiel da Silva · IA Simbólica (3/3)</div>
+ <div class="kicker">Tema 2 · Demonstração ao Vivo</div><h2>Simulador Didático: Diagnóstico por Regras Lógicas</h2>
+ <div class="sim-container">
+  <div class="sim-controls">
+   <strong style="color:var(--cyan);">Sintomas Digitados (Entrada):</strong>
+   <label><input type="checkbox" id="sym-fever" onchange="runDiagnostic()"> Febre (> 37.8ºC)</label>
+   <label><input type="checkbox" id="sym-cough" onchange="runDiagnostic()"> Tosse Persistente</label>
+   <label><input type="checkbox" id="sym-throat" onchange="runDiagnostic()"> Dor de Garganta</label>
+   <label><input type="checkbox" id="sym-fatigue" onchange="runDiagnostic()"> Cansaço / Prostração</label>
+  </div>
+  <div class="sim-output">
+   <div style="color:var(--muted); font-size:12px;">EXECUÇÃO DO MOTOR DE INFERÊNCIA (LOG):</div>
+   <div id="sim-log" class="sim-log">Aguardando entrada de dados do paciente...</div>
+   <div id="sim-diag" class="sim-diag">Diagnóstico: NENHUM SINTOMA DETECTADO</div>
+  </div>
  </div>
 </section>
 
-<section class="slide" data-title="A IA ajuda, mas exige responsabilidade" data-presenter="Veronica Belmonte · Como nos ajuda" data-notes="Apresente os benefícios e os limites. Explique que sistemas podem errar, reproduzir vieses dos dados e gerar respostas convincentes, mas incorretas. Por isso, é importante conferir informações e manter a responsabilidade humana.">
- <div class="slide-no">13 / 15</div><div class="presenter">Veronica Belmonte · Como nos ajuda</div>
- <div class="kicker">Uso consciente</div><h2>A IA ajuda, mas exige responsabilidade</h2>
+<!-- SLIDE 8: Tema 3 - Por que nem toda IA é ML? (Wellington) -->
+<section class="slide" data-title="Por que nem toda IA é Machine Learning?" data-presenter="Wellington Oliveira · Aprendizado (1/3)" data-notes="Wellington: Esclarecer a relação de conjunto: ML é apenas um subconjunto da IA. Explicar a distinção fundamental entre dedução lógica (programação de regras) e indução estatística (aprender com dados).">
+ <div class="slide-no">08 / 23</div><div class="presenter">Wellington Oliveira · ML (1/3)</div>
+ <div class="kicker">Tema 3 · Aprendizado de Máquina</div><h2>Por que nem toda IA usa Machine Learning?</h2>
+ <p>Existe uma confusão comum ao equiparar IA a Aprendizado de Máquina. O Aprendizado de Máquina é apenas um <strong>subconjunto</strong> da Inteligência Artificial.</p>
  <div class="compare">
-  <div class="tile"><div class="tag">Possibilidades</div><h3>✓ Pode ajudar</h3><p>Agilizar tarefas, organizar informações, apoiar decisões e auxiliar na solução de problemas.</p></div>
-  <div class="tile"><div class="tag">Cuidados</div><h3>⚠ É preciso conferir</h3><p>Pode apresentar erros, reproduzir vieses e produzir resultados que precisam de avaliação humana.</p></div>
+  <div class="tile"><div class="tag">Paradigma Simbólico (Regras)</div><h3>Dedução Lógica Explicitada</h3><p>Pessoas definem as regras. O sistema aplica rigorosamente o código predeterminado sem necessitar de grandes volumes de dados históricos.</p></div>
+  <div class="tile"><div class="tag">Paradigma Conexionista (ML)</div><h3>Indução Estatística por Dados</h3><p>Modelos (como redes neurais) treinam com dados brutos para descobrir padrões ocultos e aproximar funções matemáticas complexas.</p></div>
  </div>
- <p class="quote">Podemos confiar em tudo o que uma inteligência artificial responde?</p>
 </section>
 
-<section class="slide" data-title="O que aprendemos sobre inteligência artificial?" data-presenter="Glaucio da Silva · Conclusão" data-notes="Retome os quatro eixos da apresentação. Peça aos colegas que lembrem um exemplo de cada tema: definição de IA, regras, aprendizado de máquina e uso cotidiano.">
- <div class="slide-no">14 / 15</div><div class="presenter">Glaucio da Silva · Conclusão</div>
- <div class="kicker">Retomando a apresentação</div><h2>O que aprendemos sobre inteligência artificial?</h2>
+<!-- SLIDE 9: Tema 3 - Exemplo Prático 1: Regras Determinísticas (Wellington) -->
+<section class="slide" data-title="Exemplo Prático 1: Pedra, Papel e Tesoura" data-presenter="Wellington Oliveira · Aprendizado (2/3)" data-notes="Wellington: Detalhar o 1º exemplo cotidiano. Sistema de Pedra, Papel e Tesoura. Mostrar as entradas (escolhas), o processamento determinístico pelas regras condicionais e a saída direta (vencedor/empate).">
+ <div class="slide-no">09 / 23</div><div class="presenter">Wellington Oliveira · ML (2/3)</div>
+ <div class="kicker">Tema 3 · Exemplo Prático 1</div><h2>Exemplo 1: Sistema de Regras (Pedra, Papel, Tesoura)</h2>
+ <p>Sistemas determinísticos não exigem aprendizado por dados; o domínio é perfeitamente mapeado por tabelas ou condições condicionais simples.</p>
+ <div class="grid three">
+  <div class="tile"><span class="ico">📥</span><h3>Entrada de Dados</h3><p>Escolhas discretas dos jogadores:<br><code>[Jogador 1: Pedra, Jogador 2: Tesoura]</code></p></div>
+  <div class="tile"><span class="ico">⚙️</span><h3>Processamento Lógico</h3><p>Avaliação da regra:<br><b>SE</b> Pedra vs Tesoura <b>ENTÃO</b> Pedra vence.</p></div>
+  <div class="tile"><span class="ico">📤</span><h3>Saída Produzida</h3><p>Resultado imediato e incontestável:<br><code>"Jogador 1 Venceu"</code></p></div>
+ </div>
+</section>
+
+<!-- SLIDE 10: Tema 3 - Exemplo Prático 2: Machine Learning (Wellington) -->
+<section class="slide" data-title="Exemplo Prático 2: Classificação de Frutas" data-presenter="Wellington Oliveira · Aprendizado (3/3)" data-notes="Wellington: Detalhar o 2º exemplo cotidiano. Reconhecimento de frutas por câmera. Mostrar a inviabilidade de criar regras fixas para pixels e a necessidade de ML treinado com milhares de fotos.">
+ <div class="slide-no">10 / 23</div><div class="presenter">Wellington Oliveira · ML (3/3)</div>
+ <div class="kicker">Tema 3 · Exemplo Prático 2</div><h2>Exemplo 2: Machine Learning (Visão Computacional)</h2>
+ <p>Para reconhecer frutas em uma foto, programar regras manuais sobre cores e formatos exatos é inviável devido à variação do mundo real.</p>
+ <div class="grid three">
+  <div class="tile"><span class="ico">📷</span><h3>Entrada de Dados</h3><p>Matriz de Pixels de uma imagem capturada por câmera de supermercado.</p></div>
+  <div class="tile"><span class="ico">🧬</span><h3>Processamento ML</h3><p>Rede Neural Convulocional analisa bordas, texturas e formas aprendidas com 100 mil imagens.</p></div>
+  <div class="tile"><span class="ico">🏷️</span><h3>Saída Produzida</h3><p>Rótulo preditivo de probabilidade:<br><code>"Maçã Fuji (Confiança: 98.4%)"</code></p></div>
+ </div>
+</section>
+
+<!-- SLIDE 11: Tema 4 - Explicabilidade & Auditabilidade (Soraia) -->
+<section class="slide" data-title="Explicabilidade, Auditabilidade e Segurança" data-presenter="Soraia Miranda · Segurança (1/3)" data-notes="Soraia: Explicar a diferença entre a 'caixa-preta' dos modelos profundos de IA e a transparência total dos sistemas baseados em regras, essencial para auditorias governamentais e corporativas.">
+ <div class="slide-no">11 / 23</div><div class="presenter">Soraia Miranda · Segurança (1/3)</div>
+ <div class="kicker">Tema 4 · Segurança & Governança</div><h2>Explicabilidade e Auditabilidade em IA</h2>
+ <p>Modelos avançados de Aprendizado Profundo atuarão frequentemente como <strong>caixas-pretas</strong> (black boxes), dificultando a explicação do porquê de uma decisão matemática.</p>
+ <div class="rule-list">
+  <div class="rule"><b>Explicabilidade:</b> A capacidade de um sistema explicar em linguagem clara o raciocínio e os critérios que geraram a saída.</div>
+  <div class="rule"><b>Auditabilidade:</b> A rastreabilidade completa de todo o processo decisório para inspeção pericial e verificação jurídica.</div>
+ </div>
+ <div class="pill">Sistemas baseados em regras fornecem 100% de auditabilidade nativa.</div>
+</section>
+
+<!-- SLIDE 12: Tema 4 - Aplicações em Setores Regulados (Soraia) -->
+<section class="slide" data-title="Por que usar Regras em Setores Regulados?" data-presenter="Soraia Miranda · Segurança (2/3)" data-notes="Soraia: Mostrar áreas onde a imprevisibilidade de estatísticas é inaceitável: aviação, medicina crítica, normas fiscais e direito. Regras determinísticas garantem conformidade exata com leis.">
+ <div class="slide-no">12 / 23</div><div class="presenter">Soraia Miranda · Segurança (2/3)</div>
+ <div class="kicker">Tema 4 · Setores Críticos</div><h2>Por que usar Regras em Setores Regulados?</h2>
+ <p>Em domínios críticos, falhas imprevisíveis ou falta de fundamentação legal implicam riscos de acidentes graves ou sanções jurídicas imensas.</p>
+ <div class="grid four">
+  <div class="tile"><span class="ico">✈️</span><h3>Aviação</h3><p>Sistemas autopiloto e checklists seguem regras estritas de segurança.</p></div>
+  <div class="tile"><span class="ico">⚖️</span><h3>Direito & Compliance</h3><p>Verificação de requisitos legais e elegibilidade tributária determinística.</p></div>
+  <div class="tile"><span class="ico">🏦</span><h3>Crédito Bancário</h3><p>Regras claras aprovam ou negam limites respeitando normas de compliance.</p></div>
+  <div class="tile"><span class="ico">🏥</span><h3>Medicina Crítica</h3><p>Protocolos de dosagem de medicamentos e triagem com margem zero de desvio.</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 13: Tema 4 - Situação de Erro & Consequências (Soraia) -->
+<section class="slide" data-title="Falhas em Sistemas de Regras" data-presenter="Soraia Miranda · Segurança (3/3)" data-notes="Soraia: Atender ao Requisito 4 do trabalho. Mostrar como um sistema baseado em regras pode errar (regras incompletas, desatualizadas ou contradições) e detalhar as possíveis consequências operacionais.">
+ <div class="slide-no">13 / 23</div><div class="presenter">Soraia Miranda · Segurança (3/3)</div>
+ <div class="kicker">Tema 4 · Riscos e Limitações</div><h2>Quando o Sistema de Regras Erra?</h2>
+ <p>Sistemas baseados em regras não erram por estatística, mas falham por <strong>rigidez, incompletude ou erros na programação humana</strong>.</p>
+ <div class="compare">
+  <div class="tile"><div class="tag">Causa da Falha</div><h3>Regras Incompletas ou Desatualizadas</h3><p>O sistema recebe uma condição não prevista na base de conhecimento (cenário de borda) e paralisa ou toma uma decisão equivocada.</p></div>
+  <div class="tile"><div class="tag">Consequências</div><h3>Impacto no Mundo Real</h3><p>Bloqueio injusto de acessos, negação indevida de tratamentos de saúde ou falhas operacionais por falta de flexibilidade ao contexto.</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 14: Tema 5 - IA no Cotidiano: Onde Está (Mariestela) -->
+<section class="slide" data-title="Onde Encontramos a IA no Cotidiano?" data-presenter="Mariestela Lima · Cotidiano (1/3)" data-notes="Mariestela: Mapear a presença da IA no dia a dia da turma. Destacar aplicações cotidianas em celulares, entretenimento, transporte, compras e segurança bancária.">
+ <div class="slide-no">14 / 23</div><div class="presenter">Mariestela Lima · Cotidiano (1/3)</div>
+ <div class="kicker">Tema 5 · IA no Cotidiano</div><h2>Onde Encontramos a Inteligência Artificial?</h2>
+ <div class="grid four">
+  <div class="tile"><span class="ico">📱</span><h3>Assistentes Pessoais</h3><p>Reconhecimento de voz e automação no smartphone.</p></div>
+  <div class="tile"><span class="ico">🎬</span><h3>Streaming</h3><p>Recomendação de filmes e músicas por preferências.</p></div>
+  <div class="tile"><span class="ico">🗺️</span><h3>Mobilidade</h3><p>Otimização de rotas em tempo real (GPS/Waze).</p></div>
+  <div class="tile"><span class="ico">💳</span><h3>Finanças</h3><p>Detecção instantânea de fraudes bancárias.</p></div>
+  <div class="tile"><span class="ico">🛍️</span><h3>E-commerce</h3><p>Vitrines personalizadas e suporte via Chatbot.</p></div>
+  <div class="tile"><span class="ico">🤖</span><h3>Robótica</h3><p>Braços mecânicos em indústrias e robôs aspiradores.</p></div>
+  <div class="tile"><span class="ico">🌐</span><h3>Tradução</h3><p>Conversão instantânea de idiomas por contexto.</p></div>
+  <div class="tile"><span class="ico">🩺</span><h3>Triagem Médica</h3><p>Preenchimento automático de formulários de saúde.</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 15: Tema 5 - Jornada Diária Conectada (Mariestela) -->
+<section class="slide" data-title="A Jornada Diária de um Usuário Conectado" data-presenter="Mariestela Lima · Cotidiano (2/3)" data-notes="Mariestela: Apresentar a narrativa visual de um dia comum de uma pessoa conectada, mostrando como interagem múltiplos sistemas de IA do momento em que acorda até a noite.">
+ <div class="slide-no">15 / 23</div><div class="presenter">Mariestela Lima · Cotidiano (2/3)</div>
+ <div class="kicker">Tema 5 · Presença Invisível</div><h2>Um Dia Conectado à Inteligência Artificial</h2>
+ <div class="flow">
+  <div class="flowbox"><span>⏰ 07:00</span>Desbloqueio Facial no Celular</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>🚗 08:00</span>Rota Otimizada pelo GPS</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>💳 12:30</span>Filtro Anti-Fraude no Cartão</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>🎧 20:00</span>Playlist Personalizada</div>
+ </div>
+ <p class="quote" style="margin-top:14px;">A IA tornou-se uma infraestrutura transparente: está presente mesmo quando não notamos sua execução.</p>
+</section>
+
+<!-- SLIDE 16: Tema 6 - Como a IA nos Ajuda (Mariestela) -->
+<section class="slide" data-title="Como a IA nos Ajuda?" data-presenter="Mariestela Lima · Cotidiano (3/3)" data-notes="Mariestela: Apresentar os benefícios tangíveis da IA nas áreas de educação, saúde, acessibilidade para pessoas com deficiência, automação de processos repetitivos e ganho de produtividade.">
+ <div class="slide-no">16 / 23</div><div class="presenter">Mariestela Lima · Cotidiano (3/3)</div>
+ <div class="kicker">Tema 6 · Como nos Ajuda</div><h2>Benefícios da IA na Vida Moderna</h2>
+ <div class="grid">
+  <div class="tile"><span class="ico">📚</span><h3>Educação & Estudo</h3><p>Plataformas adaptativas e tutores interativos personalizados.</p></div>
+  <div class="tile"><span class="ico">♿</span><h3>Acessibilidade</h3><p>Leitura de tela para deficientes visuais e transcrição em tempo real.</p></div>
+  <div class="tile"><span class="ico">⏱️</span><h3>Automação de Tarefas</h3><p>Eliminação de rotinas burocráticas e repetitivas.</p></div>
+  <div class="tile"><span class="ico">🩺</span><h3>Suporte Clínico</h3><p>Auxílio na detecção precoce de alterações em exames de imagem.</p></div>
+  <div class="tile"><span class="ico">🚦</span><h3>Gestão de Trânsito</h3><p>Semáforos inteligentes que ajustam tempos conforme o fluxo.</p></div>
+  <div class="tile"><span class="ico">🌱</span><h3>Agricultura de Precisão</h3><p>Monitoramento de pragas e aplicação otimizada de recursos.</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 17: Tema 6 - Cuidados no Uso da IA (Veronica) -->
+<section class="slide" data-title="Cuidados no Uso da IA" data-presenter="Veronica Belmonte · Cuidados (1/3)" data-notes="Veronica: Atender ao Requisito 5 do trabalho. Discutir riscos éticos: vieses algorítmicos, privacidade de dados, direitos autorais e a dependência ou confiança excessiva nas respostas automatizadas.">
+ <div class="slide-no">17 / 23</div><div class="presenter">Veronica Belmonte · Cuidados (1/3)</div>
+ <div class="kicker">Tema 6 · Cuidados Necessários</div><h2>Cuidados Essenciais no Uso da IA</h2>
+ <div class="grid four">
+  <div class="tile"><span class="ico">🔒</span><h3>Privacidade</h3><p>Coleta maciça e uso indevido de dados pessoais sem consentimento.</p></div>
+  <div class="tile"><span class="ico">⚖️</span><h3>Vieses nos Dados</h3><p>Reprodução e amplificação de preconceitos históricos pelos algoritmos.</p></div>
+  <div class="tile"><span class="ico">©️</span><h3>Direitos Autorais</h3><p>Uso indevido de obras de artistas para treinamento de IA generativa.</p></div>
+  <div class="tile"><span class="ico">⚠️</span><h3>Confiança Excessiva</h3><p>Aceitar respostas automatizadas sem verificação e senso crítico humano.</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 18: Tema 7 - Questões Éticas e Autonomia (Veronica) -->
+<section class="slide" data-title="Questões Éticas e Autonomia (Dora Kaufman)" data-presenter="Veronica Belmonte · Ética (2/3)" data-notes="Veronica: Trazer a fundamentação da Profa. Dora Kaufman sobre a transição para uma sociedade datacêntrica e os dois grandes dilemas: autonomia vs controle humano e machine ethics.">
+ <div class="slide-no">18 / 23</div><div class="presenter">Veronica Belmonte · Ética (2/3)</div>
+ <div class="kicker">Tema 7 · Questões Éticas</div><h2>Ética e Autonomia segundo Dora Kaufman</h2>
+ <p>Conforme analisa a pesquisadora Dora Kaufman (2016), a ascensão da IA coloca a humanidade diante da necessidade de manter o controle sobre entidades autônomas.</p>
+ <div class="compare">
+  <div class="tile"><div class="tag">Dilema 1</div><h3>Autonomia vs. Controle Humano</h3><p>Até que ponto devemos delegar decisões críticas a sistemas sem supervisão direta de pessoas?</p></div>
+  <div class="tile"><div class="tag">Dilema 2</div><h3>Machine Ethics (Ética das Máquinas)</h3><p>Como incorporar valores e princípios morais humanos nos algoritmos decisórios?</p></div>
+ </div>
+</section>
+
+<!-- SLIDE 19: Tema 7 - Da Sociedade Antropocêntrica à Datacêntrica (Veronica) -->
+<section class="slide" data-title="Mudança de Paradigma: Antropocêntrica a Datacêntrica" data-presenter="Veronica Belmonte · Ética (3/3)" data-notes="Veronica: Explicar o conceito de Kaufman e Harari sobre o deslocamento da autoridade humana para os algoritmos em rede não-conscientes, exigindo a preservação da responsabilidade humana.">
+ <div class="slide-no">19 / 23</div><div class="presenter">Veronica Belmonte · Ética (3/3)</div>
+ <div class="kicker">Tema 7 · Mudança de Paradigma</div><h2>Da Sociedade Antropocêntrica à Datacêntrica</h2>
+ <p style="margin-bottom:10px;">A migração do foco da autoridade humana para o processamento de dados coloca em debate o papel da responsabilidade ética.</p>
+ <div class="flow">
+  <div class="flowbox"><span>👤</span>Sociedade Antropocêntrica</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>🌐</span>Fluxos de Dados Globais</div><div class="flowarrow">→</div>
+  <div class="flowbox"><span>📊</span>Decisões Datacêntricas</div>
+ </div>
+ <p class="quote" style="margin-top:14px;">“A responsabilidade pelo desenvolvimento, parametrização e uso da tecnologia continua sendo integralmente humana.”</p>
+</section>
+
+<!-- SLIDE 20: Tema 7 - O Futuro das IAs Híbridas (Glaucio) -->
+<section class="slide" data-title="Sistemas Híbridos Neuro-Simbólicos" data-presenter="Glaucio da Silva · Futuro (1/3)" data-notes="Glaucio: Apresentar a síntese do seminário. O futuro da IA não é a escolha exclusiva entre Regras ou ML, mas sim a integração Híbrida (Neuro-Simbólica) unindo aprendizado por dados com governança por regras.">
+ <div class="slide-no">20 / 23</div><div class="presenter">Glaucio da Silva · Futuro (1/3)</div>
+ <div class="kicker">Tema 7 · Tendência do Futuro</div><h2>A Solução: Sistemas Híbridos (Neuro-Simbólicos)</h2>
+ <p>O futuro da Computação caminha para a união das duas grandes correntes da IA:</p>
+ <div class="compare">
+  <div class="tile"><div class="tag">Aprender com Dados</div><h3>Machine Learning / Deep Learning</h3><p>Capacidade de reconhecer padrões complexos, percepção de imagens e linguagem natural.</p></div>
+  <div class="tile"><div class="tag">Governar com Lógica</div><h3>IA Simbólica (Baseada em Regras)</h3><p>Camada de controle que garante explicabilidade, segurança, limites éticos e cumprimento das leis.</p></div>
+ </div>
+ <div class="pill" style="margin-top:6px;">Resultando em sistemas inteligentes, precisos, transparentes e seguros</div>
+</section>
+
+<!-- SLIDE 21: Pergunta Interativa para a Turma (Glaucio) -->
+<section class="slide" data-title="Pergunta Interativa para a Turma" data-presenter="Glaucio da Silva · Interatividade (2/3)" data-notes="Glaucio: Atender ao Requisito 6 do trabalho. Apresentar a pergunta interativa para a turma sobre o simulador médico e interagir com os colegas sobre a resposta correta.">
+ <div class="slide-no">21 / 23</div><div class="presenter">Glaucio da Silva · Interatividade (2/3)</div>
+ <div class="kicker">Encerramento · Interatividade</div><h2>Pergunta para a Turma</h2>
+ <p class="quiz-question">Considerando o simulador de diagnóstico médico por regras (SE... ENTÃO) apresentado anteriormente no Slide 07, o que acontecerá se um paciente apresentar um sintoma totalmente novo não cadastrado na base de conhecimento?</p>
+ <div class="quiz-options">
+  <button class="quiz-option" onclick="checkAnswer(this, false)">A) O sistema aprenderá sozinho o novo sintoma e inventará uma nova regra médica.</button>
+  <button class="quiz-option" onclick="checkAnswer(this, true)">B) O sistema não reconhecerá a nova condição, mostrando a limitação de não generalizar dados ausentes na sua base de regras.</button>
+  <button class="quiz-option" onclick="checkAnswer(this, false)">C) O sistema acionará automaticamente uma Rede Neural para adivinhar a doença.</button>
+ </div>
+ <div id="quiz-feedback">Selecione a alternativa que julgar correta!</div>
+</section>
+
+<!-- SLIDE 22: Conclusão Geral do Grupo (Glaucio) -->
+<section class="slide" data-title="Conclusão Geral" data-presenter="Glaucio da Silva · Conclusão (3/3)" data-notes="Glaucio: Recapitular brevemente a jornada do seminário: origens da IA, decisão baseada em regras, explicabilidade, presença no cotidiano e a necessidade de governança humana sobre os algoritmos.">
+ <div class="slide-no">22 / 23</div><div class="presenter">Glaucio da Silva · Conclusão (3/3)</div>
+ <div class="kicker">Síntese Final</div><h2>Conclusão do Seminário</h2>
  <div class="grid two">
-  <div class="tile"><h3>01 · O que é IA?</h3><p>Sistemas que realizam tarefas como reconhecer informações e apoiar decisões.</p></div>
-  <div class="tile"><h3>02 · Decisões por regras</h3><p>Condições definidas por pessoas orientam ações do sistema.</p></div>
-  <div class="tile"><h3>03 · Aprendizado de máquina</h3><p>Nem toda IA utiliza modelos que aprendem padrões com dados.</p></div>
-  <div class="tile"><h3>04 · Cotidiano</h3><p>A IA está presente em diferentes ferramentas e atividades.</p></div>
+  <div class="tile"><h3>01 · Transparência & Regras</h3><p>Sistemas simbólicos continuam indispensáveis quando explicabilidade e auditabilidade total são exigidas.</p></div>
+  <div class="tile"><h3>02 · Aprendizado Complementar</h3><p>Machine Learning e regras não competem, mas se completam em arquiteturas modernas neuro-simbólicas.</p></div>
+  <div class="tile"><h3>03 · Impacto Social</h3><p>A IA está integrada à rotina diária, exigindo cuidados com privacidade, direitos autorais e vieses.</p></div>
+  <div class="tile"><h3>04 · Responsabilidade Humana</h3><p>A tecnologia executa instruções, mas os limites éticos e os objetivos devem ser guiados por escolhas humanas.</p></div>
  </div>
 </section>
 
-<section class="slide" data-title="Tecnologia, decisões e responsabilidade humana" data-presenter="Glaucio da Silva · Conclusão" data-notes="Encerre destacando que sistemas inteligentes são desenvolvidos e utilizados dentro de escolhas humanas e sociais. Convide o público a refletir sobre responsabilidade, supervisão, transparência e consequências. A referência indicada é de 2016; use-a como contribuição para a discussão ética, sem apresentá-la como panorama atualizado de todas as tecnologias atuais.">
- <div class="slide-no">15 / 15</div><div class="presenter">Glaucio da Silva · Conclusão</div>
- <div class="kicker">Reflexão final</div><h2>Inteligência artificial: tecnologia, decisões e responsabilidade humana</h2>
- <p>Compreender como os sistemas funcionam também significa refletir sobre quem define suas regras, como seus resultados são utilizados e quais consequências podem gerar.</p>
- <div class="flow">
-  <div class="flowbox"><span>👥</span>Pessoas e escolhas</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>⚙️</span>Tecnologia e decisões</div><div class="flowarrow">→</div>
-  <div class="flowbox"><span>🌍</span>Impactos na sociedade</div>
+<!-- SLIDE 23: Referências Consultadas -->
+<section class="slide" data-title="Referências Consultadas" data-notes="Apresentar as referências consultadas conforme o Requisito 7 do trabalho, citando as obras de Russell & Norvig, Dora Kaufman, Vinícius Machado, Monard & Baranauskas e os artigos da Revista Tecnologia Educacional.">
+ <div class="slide-no">23 / 23</div>
+ <div class="kicker">Requisito 7 · Fontes Consultadas</div><h2>Referências Bibliográficas</h2>
+ <div class="reference" style="display:grid; gap:8px;">
+  <div>BARBOSA, L. M.; PORTES, L. A. F. A Inteligência Artificial. <strong>Revista Tecnologia Educacional</strong>, Rio de Janeiro, n. 236, p. 16-27, jan./mar. 2023.</div>
+  <div>KAUFMAN, Dora. Inteligência Artificial: questões éticas a serem enfrentadas. In: <strong>IX Simpósio Nacional ABCiber</strong>. São Paulo: PUC-SP, 2016. p. 1-15.</div>
+  <div>MACHADO, Vinícius Ponte. <strong>Inteligência Artificial</strong>. Teresina: EDUFPI/UAPI, 2013. 126 p.</div>
+  <div>MONARD, M. C.; BARANAUSKAS, J. A. Indução de Regras e Árvores de Decisão. In: BITTENCOURT, G. (Org.). <strong>Inteligência Artificial: Ferramentas e Teorias</strong>. Florianópolis: Ed. da UFSC, 2001. cap. 5, p. 57-74.</div>
+  <div>PEREIRA, M. S. C.; SOUZA, T. F. C. ChatGPT: algumas reflexões. <strong>Revista Tecnologia Educacional</strong>, Rio de Janeiro, n. 236, p. 7-15, jan./mar. 2023.</div>
+  <div>RUSSELL, Stuart; NORVIG, Peter. <strong>Inteligência Artificial: uma abordagem moderna</strong>. 3. ed. Rio de Janeiro: Elsevier, 2013.</div>
  </div>
- <p class="quote">“A responsabilidade pelo desenvolvimento e pelo uso da tecnologia continua sendo humana.”</p>
- <div class="reference"><strong>Referência para reflexão:</strong><br>
- KAUFMAN, Dora. <em>Inteligência artificial: questões éticas a serem enfrentadas.</em> 2016.<br>
- <a href="https://abciber.org.br/anaiseletronicos/wp-content/uploads/2016/trabalhos/inteligencia_artificial_questoes_eticas_a_serem_enfrentadas_dora_kaufman.pdf" target="_blank" rel="noopener">Acessar o artigo em PDF</a></div>
 </section>
 
-</main></div>
+</main>
+</div>
 
+<!-- Barra de Controle Inferior (HUD) -->
 <div id="hud">
  <button id="prev" aria-label="Slide anterior">←</button>
- <span id="counter">1 / 15</span>
+ <span id="counter">1 / 23</span>
  <button class="primary" id="next" aria-label="Próximo slide">Próximo →</button>
  <button id="mapbtn">Mapa</button>
  <button id="notesbtn">Notas</button>
  <button id="fullbtn" title="Tela cheia">⛶</button>
 </div>
-<div id="hint">Use ← → ou espaço para navegar</div>
+
+<div id="hint">Navegação: ← → ou Barra de Espaço</div>
+
+<!-- Modal Mapa dos Slides -->
 <div id="mapmodal" class="modal">
- <h2>Mapa da apresentação</h2><p>Selecione um assunto para ir diretamente até ele.</p>
- <div class="mapgrid" id="mapgrid"></div><button id="mapclose">Fechar mapa</button>
+ <h2>Mapa da Apresentação (23 Slides)</h2>
+ <p>Clique em qualquer slide para saltar diretamente até ele.</p>
+ <div class="mapgrid" id="mapgrid"></div>
+ <button id="mapclose" class="primary">Fechar Mapa</button>
 </div>
-<aside id="notes" class="notes-panel"><h3>Anotações do apresentador</h3><p id="notetext"></p><p class="tiny" style="margin-top:12px">As notas não aparecem na apresentação projetada.</p></aside>
+
+<!-- Painel de Anotações do Apresentador -->
+<aside id="notes" class="notes-panel">
+ <h3>Anotações do Apresentador</h3>
+ <p id="notetext"></p>
+ <p class="tiny" style="margin-top:12px;">Estas notas orientam a fala durante o seminário.</p>
+</aside>
 
 <script>
 (() => {
- const world=document.getElementById('world');
- const slides=[...document.querySelectorAll('.slide')];
- const counter=document.getElementById('counter');
- const progress=document.getElementById('progress');
- const prev=document.getElementById('prev'),next=document.getElementById('next');
- const mapmodal=document.getElementById('mapmodal'),notes=document.getElementById('notes');
- let current=0,resizeTimer;
- const positions=[
-  [0,0],[1350,0],[2700,0],[4050,0],[5400,0],
-  [6750,0],[8100,0],[9450,0],[10800,0],[12150,0],
-  [13500,0],[14850,0],[16200,0],[17550,0],[18900,0]
- ];
- slides.forEach((s,i)=>{
-  s.style.left=positions[i][0]+'px';
-  s.style.top=positions[i][1]+'px';
+ const world = document.getElementById('world');
+ const slides = [...document.querySelectorAll('.slide')];
+ const counter = document.getElementById('counter');
+ const progress = document.getElementById('progress');
+ const prev = document.getElementById('prev');
+ const next = document.getElementById('next');
+ const mapmodal = document.getElementById('mapmodal');
+ const notes = document.getElementById('notes');
+ let current = 0;
+ let resizeTimer;
+
+ // Layout em Matriz Prezi 2D (5 colunas x 5 linhas)
+ const positions = [];
+ const spacingX = 1400;
+ const spacingY = 850;
+
+ for (let i = 0; i < slides.length; i++) {
+  const col = i % 5;
+  const row = Math.floor(i / 5);
+  positions.push([col * spacingX, row * spacingY]);
+ }
+
+ slides.forEach((s, i) => {
+  s.style.left = positions[i][0] + 'px';
+  s.style.top = positions[i][1] + 'px';
  });
- function go(index){
-  current=Math.max(0,Math.min(slides.length-1,index));
-  const s=slides[current];
-  const w=window.innerWidth,h=window.innerHeight;
-  const scale=Math.min((w-34)/1100,(h-120)/650,1);
-  const tx=w/2-positions[current][0]*scale;
-  const ty=h/2-positions[current][1]*scale;
-  world.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
-  counter.textContent=`${current+1} / ${slides.length}`;
-  progress.style.width=((current+1)/slides.length*100)+'%';
-  prev.disabled=current===0;
-  next.disabled=current===slides.length-1;
-  next.textContent=current===slides.length-1?'Fim':'Próximo →';
-  document.getElementById('notetext').textContent=s.dataset.notes||'Sem anotações para este slide.';
+
+ function go(index) {
+  current = Math.max(0, Math.min(slides.length - 1, index));
+  const s = slides[current];
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const scale = Math.min((w - 40) / 1100, (h - 110) / 650, 1);
+  const tx = w / 2 - positions[current][0] * scale;
+  const ty = h / 2 - positions[current][1] * scale;
+
+  world.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  counter.textContent = `${current + 1} / ${slides.length}`;
+  progress.style.width = (((current + 1) / slides.length) * 100) + '%';
+  
+  prev.disabled = (current === 0);
+  next.disabled = (current === slides.length - 1);
+  next.textContent = (current === slides.length - 1) ? 'Fim' : 'Próximo →';
+  
+  document.getElementById('notetext').textContent = s.dataset.notes || 'Sem anotações para este slide.';
   notes.classList.remove('open');
  }
- prev.addEventListener('click',()=>go(current-1));
- next.addEventListener('click',()=>go(current+1));
- document.getElementById('fullbtn').addEventListener('click',()=>{
-  if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-  else document.exitFullscreen?.();
+
+ prev.addEventListener('click', () => go(current - 1));
+ next.addEventListener('click', () => go(current + 1));
+ 
+ document.getElementById('fullbtn').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
  });
- document.getElementById('mapbtn').addEventListener('click',()=>mapmodal.classList.add('open'));
- document.getElementById('mapclose').addEventListener('click',()=>mapmodal.classList.remove('open'));
- document.getElementById('notesbtn').addEventListener('click',()=>notes.classList.toggle('open'));
- const mapgrid=document.getElementById('mapgrid');
- slides.forEach((s,i)=>{
-  const b=document.createElement('button');b.className='mapitem';
-  b.innerHTML=`<small>SLIDE ${String(i+1).padStart(2,'0')} · ${s.dataset.presenter||''}</small><strong>${s.dataset.title||'Slide'}</strong>`;
-  b.addEventListener('click',()=>{mapmodal.classList.remove('open');go(i)});
+
+ document.getElementById('mapbtn').addEventListener('click', () => mapmodal.classList.add('open'));
+ document.getElementById('mapclose').addEventListener('click', () => mapmodal.classList.remove('open'));
+ document.getElementById('notesbtn').addEventListener('click', () => notes.classList.toggle('open'));
+
+ const mapgrid = document.getElementById('mapgrid');
+ slides.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.className = 'mapitem';
+  b.innerHTML = `<small>SLIDE ${String(i + 1).padStart(2, '0')} ${s.dataset.presenter ? '· ' + s.dataset.presenter : ''}</small><strong>${s.dataset.title || 'Slide'}</strong>`;
+  b.addEventListener('click', () => {
+    mapmodal.classList.remove('open');
+    go(i);
+  });
   mapgrid.appendChild(b);
  });
- document.addEventListener('keydown',e=>{
-  if(mapmodal.classList.contains('open')){if(e.key==='Escape')mapmodal.classList.remove('open');return}
-  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(current+1)}
-  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(current-1)}
-  if(e.key==='Home')go(0);
-  if(e.key==='End')go(slides.length-1);
-  if(e.key==='Escape')notes.classList.remove('open');
+
+ document.addEventListener('keydown', e => {
+  if (mapmodal.classList.contains('open')) {
+    if (e.key === 'Escape') mapmodal.classList.remove('open');
+    return;
+  }
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+    e.preventDefault();
+    go(current + 1);
+  }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+    e.preventDefault();
+    go(current - 1);
+  }
+  if (e.key === 'Home') go(0);
+  if (e.key === 'End') go(slides.length - 1);
+  if (e.key === 'Escape') notes.classList.remove('open');
  });
- window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>go(current),100)});
+
+ window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => go(current), 100);
+ });
+
  go(0);
 })();
+
+// Lógica da Demonstração Prática Interativa (Simulador Médico)
+function runDiagnostic() {
+  const fever = document.getElementById('sym-fever').checked;
+  const cough = document.getElementById('sym-cough').checked;
+  const throat = document.getElementById('sym-throat').checked;
+  const fatigue = document.getElementById('sym-fatigue').checked;
+
+  const log = document.getElementById('sim-log');
+  const diag = document.getElementById('sim-diag');
+
+  let rulesEvaluated = [];
+  let result = "Aguardando sintomas para avaliar...";
+  let color = "var(--cyan2)";
+
+  if (fever && cough && fatigue) {
+    rulesEvaluated.push("SE [Febre = SIM] E [Tosse = SIM] E [Cansaço = SIM] -> ENTÃO Alerta de Gripe Forte / Síndrome Viral.");
+    result = "DIAGNÓSTICO: Suspeita de Gripe Forte / Síndrome Viral (Encaminhar ao médico)";
+    color = "var(--yellow)";
+  } else if (fever && throat) {
+    rulesEvaluated.push("SE [Febre = SIM] E [Dor de Garganta = SIM] -> ENTÃO Alerta de Infecção de Garganta.");
+    result = "DIAGNÓSTICO: Suspeita de Infecção de Garganta (Avaliação presencial recomendada)";
+    color = "var(--yellow)";
+  } else if (cough || throat) {
+    rulesEvaluated.push("SE [Tosse = SIM] OU [Dor de Garganta = SIM] -> ENTÃO Sintomas Leves de Vias Aéreas.");
+    result = "DIAGNÓSTICO: Quadro Leve das Vias Aéreas (Repouso e hidratação)";
+  } else if (fever) {
+    rulesEvaluated.push("SE [Febre = SIM Isolada] -> ENTÃO Estado Febril em Observação.");
+    result = "DIAGNÓSTICO: Estado Febril Isolado (Monitorar temperatura)";
+  } else {
+    rulesEvaluated.push("Nenhuma regra condicional disparou com a combinação atual.");
+    result = "DIAGNÓSTICO: NENHUM SINTOMA CRÍTICO DETECTADO";
+  }
+
+  log.innerHTML = rulesEvaluated.join("<br>");
+  diag.innerHTML = result;
+  diag.style.color = color;
+}
+
+// Lógica da Pergunta Interativa para a Turma (Quiz)
+function checkAnswer(btn, isCorrect) {
+  const feedback = document.getElementById('quiz-feedback');
+  const options = document.querySelectorAll('.quiz-option');
+  options.forEach(opt => opt.classList.remove('correct', 'wrong'));
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedback.textContent = "CORRETO! Sistemas baseados em regras não possuem mecanismo de indução estatística; se um sintoma não está na base de regras, o sistema não consegue deduzir a nova condição.";
+    feedback.style.color = "var(--cyan2)";
+  } else {
+    btn.classList.add('wrong');
+    feedback.textContent = "INCORRETO. Lembre-se: um sistema puramente simbólico não aprende sozinho nem aciona redes neurais sem que isso tenha sido explicitamente programado.";
+    feedback.style.color = "var(--pink)";
+  }
+}
 </script>
 </body>
 </html>
