@@ -37,11 +37,24 @@ button { font: inherit; }
 #world { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; transition: transform 1050ms cubic-bezier(0.2, 0.75, 0.18, 1); }
 
 .slide {
-  position: absolute; width: 1100px; height: 650px; left: 0; top: 0; transform: translate(-50%, -50%);
-  padding: 50px 60px; border-radius: 30px; border: 1px solid rgba(167, 224, 244, 0.22);
+  position: absolute; 
+  width: 1100px; 
+  height: 650px; 
+  left: 0; 
+  top: 0; 
+  transform: translate(-50%, -50%);
+  padding: 40px 50px; 
+  border-radius: 30px; 
+  border: 1px solid rgba(167, 224, 244, 0.22);
   background: linear-gradient(140deg, rgba(17, 43, 68, 0.98), rgba(8, 25, 45, 0.98));
-  box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; gap: 18px;
-  overflow: hidden; opacity: 0.96;
+  box-shadow: var(--shadow); 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  gap: 16px;
+  overflow-y: auto; 
+  overflow-x: hidden;
+  opacity: 0.96;
 }
 
 .slide::before {
@@ -56,10 +69,10 @@ button { font: inherit; }
 
 .kicker { color: var(--cyan); font-size: 14px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
 h1, h2, h3, p { margin: 0; }
-h1 { font-size: 54px; line-height: 1.05; letter-spacing: -0.04em; max-width: 900px; }
-h2 { font-size: 42px; line-height: 1.1; letter-spacing: -0.03em; max-width: 940px; color: var(--white); }
-h3 { font-size: 20px; line-height: 1.25; }
-p { font-size: 20px; line-height: 1.45; color: var(--muted); max-width: 930px; }
+h1 { font-size: clamp(32px, 4vw, 54px); line-height: 1.05; letter-spacing: -0.04em; max-width: 900px; }
+h2 { font-size: clamp(26px, 3.2vw, 42px); line-height: 1.1; letter-spacing: -0.03em; max-width: 940px; color: var(--white); }
+h3 { font-size: clamp(16px, 1.8vw, 20px); line-height: 1.25; }
+p { font-size: clamp(15px, 1.6vw, 20px); line-height: 1.45; color: var(--muted); max-width: 930px; }
 strong { color: var(--white); }
 .small { font-size: 16px; line-height: 1.4; }
 .tiny { font-size: 13px; line-height: 1.35; color: #9db3c9; }
@@ -79,33 +92,32 @@ strong { color: var(--white); }
 .pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(85, 216, 232, 0.35); background: rgba(85, 216, 232, 0.08); color: var(--cyan2); padding: 8px 14px; border-radius: 999px; font-size: 15px; font-weight: 700; width: fit-content; }
 
 .rule-list { display: grid; gap: 10px; }
-.rule { padding: 14px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.055); border-left: 5px solid var(--cyan); font-size: 19px; line-height: 1.35; }
+.rule { padding: 14px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.055); border-left: 5px solid var(--cyan); font-size: 18px; line-height: 1.35; }
 .rule b { color: var(--yellow); }
 
-.flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: nowrap; }
-.flowbox { width: 170px; min-height: 115px; padding: 14px; border: 1px solid rgba(85, 216, 232, 0.35); background: rgba(85, 216, 232, 0.07); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; font-weight: 700; font-size: 16px; }
-.flowbox span { font-size: 30px; }
-.flowarrow { font-size: 26px; color: var(--yellow); }
+.flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.flowbox { width: 170px; min-height: 100px; padding: 12px; border: 1px solid rgba(85, 216, 232, 0.35); background: rgba(85, 216, 232, 0.07); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; font-weight: 700; font-size: 15px; }
+.flowbox span { font-size: 26px; }
+.flowarrow { font-size: 24px; color: var(--yellow); }
 
 .cover-layout { display: grid; grid-template-columns: 1.3fr 0.8fr; gap: 30px; align-items: center; }
-.cover h1 { font-size: 50px; }
-.cover .meta { font-size: 17px; color: var(--muted); line-height: 1.5; }
+.cover h1 { font-size: clamp(30px, 3.8vw, 50px); }
+.cover .meta { font-size: 16px; color: var(--muted); line-height: 1.5; }
 .people { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 15px; margin-top: 6px; }
 .person { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: #e5edf5; }
 
-.ai-orbit { height: 290px; width: 290px; border-radius: 50%; border: 1px solid rgba(85, 216, 232, 0.35); margin: auto; position: relative; display: grid; place-items: center; background: radial-gradient(circle, rgba(85, 216, 232, 0.18), rgba(85, 216, 232, 0.02) 58%, transparent 60%); }
-.ai-core { height: 120px; width: 120px; border-radius: 50%; display: grid; place-items: center; background: #164b68; border: 1px solid var(--cyan); font-size: 46px; box-shadow: 0 0 45px rgba(85, 216, 232, 0.2); }
-.orbit-node { position: absolute; border-radius: 50%; width: 52px; height: 52px; display: grid; place-items: center; background: #193b58; border: 1px solid var(--line); font-size: 22px; }
-.n1 { top: 0; left: 119px; } .n2 { right: 0; top: 119px; } .n3 { bottom: 0; left: 119px; } .n4 { left: 0; top: 119px; }
+.ai-orbit { height: 260px; width: 260px; border-radius: 50%; border: 1px solid rgba(85, 216, 232, 0.35); margin: auto; position: relative; display: grid; place-items: center; background: radial-gradient(circle, rgba(85, 216, 232, 0.18), rgba(85, 216, 232, 0.02) 58%, transparent 60%); }
+.ai-core { height: 100px; width: 100px; border-radius: 50%; display: grid; place-items: center; background: #164b68; border: 1px solid var(--cyan); font-size: 38px; box-shadow: 0 0 45px rgba(85, 216, 232, 0.2); }
+.orbit-node { position: absolute; border-radius: 50%; width: 46px; height: 46px; display: grid; place-items: center; background: #193b58; border: 1px solid var(--line); font-size: 20px; }
+.n1 { top: 0; left: 107px; } .n2 { right: 0; top: 107px; } .n3 { bottom: 0; left: 107px; } .n4 { left: 0; top: 107px; }
 
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.compare .tile { min-height: 160px; }
-.compare h3 { font-size: 22px; }
+.compare .tile { min-height: 140px; }
+.compare h3 { font-size: 20px; }
 .compare .tag { font-size: 12px; color: var(--cyan); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
 
-.quote { font-size: 24px; line-height: 1.35; color: var(--white); font-weight: 600; border-left: 4px solid var(--yellow); padding-left: 20px; max-width: 900px; }
+.quote { font-size: clamp(18px, 2.2vw, 24px); line-height: 1.35; color: var(--white); font-weight: 600; border-left: 4px solid var(--yellow); padding-left: 20px; max-width: 900px; }
 .reference { font-size: 13px; line-height: 1.45; color: #a9bdd0; overflow-wrap: anywhere; }
-.reference a { color: var(--cyan2); }
 
 /* Simulador Interativo */
 .sim-container { background: rgba(10, 30, 52, 0.9); border: 1px solid var(--cyan); border-radius: 18px; padding: 20px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
@@ -114,7 +126,7 @@ strong { color: var(--white); }
 .sim-controls input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--cyan); }
 .sim-output { background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 15px; border: 1px solid var(--line); font-family: monospace; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
 .sim-log { color: var(--yellow); min-height: 50px; }
-.sim-diag { color: var(--cyan2); font-weight: bold; font-size: 16px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.sim-diag { color: var(--cyan2); font-weight: bold; font-size: 15px; border-top: 1px dashed var(--line); padding-top: 8px; }
 
 /* HUD e Modais */
 #hud { position: fixed; z-index: 20; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; background: rgba(4,14,27,0.88); backdrop-filter: blur(14px); }
@@ -142,18 +154,42 @@ strong { color: var(--white); }
 .notes-panel h3 { margin-bottom: 10px; color: var(--cyan); }
 .notes-panel p { font-size: 14px; line-height: 1.4; }
 
-/* Estilos do Quiz Atualizados */
+/* Estilos do Quiz */
 .quiz-options { display: grid; gap: 10px; max-width: 900px; width: 100%; margin-top: 10px; }
-.quiz-option { width: 100%; text-align: left; border-radius: 12px !important; padding: 12px 16px !important; background: rgba(255,255,255,0.07) !important; font-size: 16px; border: 1px solid var(--line); color: var(--white) !important; cursor: pointer; }
+.quiz-option { width: 100%; text-align: left; border-radius: 12px !important; padding: 12px 16px !important; background: rgba(255,255,255,0.07) !important; font-size: 15px; border: 1px solid var(--line); color: var(--white) !important; cursor: pointer; }
 .quiz-option.correct { border-color: var(--cyan) !important; color: var(--yellow) !important; background: rgba(85,216,232,0.15) !important; font-weight: bold; }
 .quiz-option.wrong { border-color: var(--pink) !important; color: var(--yellow) !important; background: rgba(255,140,168,0.15) !important; font-weight: bold; }
-#quiz-feedback { min-height: 35px; color: var(--yellow); font-size: 16px; font-weight: 600; margin-top: 10px; }
+#quiz-feedback { min-height: 35px; color: var(--yellow); font-size: 15px; font-weight: 600; margin-top: 10px; }
 
-@media (max-width: 760px) {
-  #hud { bottom: 9px; gap: 4px; padding: 6px; } #hud button { padding: 7px 9px; font-size: 11px; } #hint { display: none; }
-  .slide { padding: 30px 24px; width: 95vw; height: 85vh; } .cover-layout { grid-template-columns: 1fr; } .cover .ai-orbit { display: none; }
-  .sim-container { grid-template-columns: 1fr; }
+/* REGRAS DE RESPONSIVIDADE PARA DISPOSITIVOS MÓVEIS (CELULARES E TABLETS) */
+@media (max-width: 850px) {
+  .slide { 
+    width: 92vw; 
+    height: 80vh; 
+    padding: 25px 20px; 
+    border-radius: 20px;
+  }
+  
+  .presenter { display: none !important; }
+  .slide-no { top: 14px; left: 20px; }
+  
+  .grid, .grid.two, .grid.four, .compare, .sim-container, .cover-layout { 
+    grid-template-columns: 1fr !important; 
+    gap: 10px; 
+  }
+  
+  .flow { flex-direction: column; gap: 6px; }
+  .flowarrow { transform: rotate(90deg); }
+  .flowbox { width: 100%; min-height: auto; padding: 10px; }
+  
+  .ai-orbit { display: none; }
+  .people { grid-template-columns: 1fr; }
+  
+  #hud { bottom: 10px; padding: 6px 10px; gap: 4px; width: 92%; justify-content: space-between; }
+  #hud button { padding: 6px 10px; font-size: 11px; }
+  #hint { display: none; }
 }
+
 @media (prefers-reduced-motion: reduce) { #world { transition: none; } }
 </style>
 </head>
@@ -171,8 +207,8 @@ strong { color: var(--white); }
   <div>
    <div class="kicker">Introdução à Computação · Licenciatura</div>
    <h1>Inteligência Artificial que Toma Decisões Seguindo Regras</h1>
-   <p class="meta" style="margin-top:14px">Professor Gilberto Xavier Loio<br>Curso de Licenciatura em Computação — CPAN-UFMS</p>
-   <div class="kicker" style="margin-top:18px">Acadêmicos</div>
+   <p class="meta" style="margin-top:10px">Professor Gilberto Xavier Loio<br>Curso de Licenciatura em Computação — CPAN-UFMS</p>
+   <div class="kicker" style="margin-top:14px">Acadêmicos</div>
    <div class="people">
     <div class="person">Moisés Lopes</div><div class="person">Jesiel da Silva</div>
     <div class="person">Wellington Oliveira</div><div class="person">Soraia Miranda</div>
@@ -188,7 +224,7 @@ strong { color: var(--white); }
 <section class="slide" data-title="Introdução & Origens da IA" data-presenter="Moisés Lopes · Slide 1/3" data-notes="Moisés: Apresentar o nascimento da IA na Conferência de Dartmouth (1956) com McCarthy, Minsky, Rochester e Shannon. Destacar a busca inicial por simular capacidades humanas via computação.">
  <div class="slide-no">02 / 23</div><div class="presenter">Moisés Lopes · Introdução (1/3)</div>
  <div class="kicker">Tema 1 · Introdução</div><h2>As Origens da Inteligência Artificial</h2>
- <p>Formalizada em 1956 na Conferência de Dartmouth, a IA nasceu do objetivo de criar máquinas capazes de realizar tarefas que exigem inteligência humana.</p>
+ <p>Formalizada em 1956 na Conferência de Dartmouth, a IA nasceu do objetivo de criar máquinas capables de realizar tarefas que exigem inteligência humana.</p>
  <div class="grid">
   <div class="tile"><span class="ico">🏛️</span><h3>Dartmouth (1956)</h3><p>Termo cunhado por John McCarthy, Marvin Minsky, Nathaniel Rochester e Claude Shannon.</p></div>
   <div class="tile"><span class="ico">💻</span><h3>Ciência Computacional</h3><p>Subárea dedicada a simular a capacidade de pensar, raciocinar e agir.</p></div>
@@ -432,7 +468,7 @@ strong { color: var(--white); }
 <section class="slide" data-title="Pergunta Interativa para a Turma" data-presenter="Glaucio da Silva · Interatividade (2/3)" data-notes="Glaucio: Atender ao Requisito 6 do trabalho. Apresentar a pergunta interativa para a turma sobre o simulador médico e interagir com os colegas sobre a resposta correta.">
  <div class="slide-no">21 / 23</div><div class="presenter">Glaucio da Silva · Interatividade (2/3)</div>
  <div class="kicker">Encerramento · Interatividade</div><h2>Pergunta para a Turma</h2>
- <p class="quiz-question">Considerando o simulador de diagnóstico médico por regras (SE... ENTÃO) apresentado anteriormente no Slide 07, o que acontecerá se um paciente apresentar um sintoma totalmente novo não cadastrado na base de conhecimento?</p>
+ <p class="quiz-question">Considerando o simulador de diagnóstico médico por regras (SE... ENTÃO) apresentado anteriormente no Slide 7, o que acontecerá se um paciente apresentar um sintoma totalmente novo não cadastrado na base de conhecimento?</p>
  <div class="quiz-options">
   <button class="quiz-option" onclick="checkAnswer(this, false)">A) O sistema aprenderá sozinho o novo sintoma e inventará uma nova regra médica.</button>
   <button class="quiz-option" onclick="checkAnswer(this, true)">B) O sistema não reconhecerá a nova condição, mostrando a limitação de não generalizar dados ausentes na sua base de regras.</button>
@@ -510,7 +546,7 @@ strong { color: var(--white); }
  let current = 0;
  let resizeTimer;
 
- // Layout em Matriz Prezi 2D (5 colunas x 5 linhas)
+ // Layout em Matriz Prezi 2D
  const positions = [];
  const spacingX = 1400;
  const spacingY = 850;
@@ -531,7 +567,12 @@ strong { color: var(--white); }
   const s = slides[current];
   const w = window.innerWidth;
   const h = window.innerHeight;
-  const scale = Math.min((w - 40) / 1100, (h - 110) / 650, 1);
+  
+  // Cálculo de escala responsivo adaptado para Telas de Computador vs Celulares
+  const targetWidth = (w <= 850) ? (w * 0.95) : 1100;
+  const targetHeight = (w <= 850) ? (h * 0.85) : 650;
+  
+  const scale = Math.min(w / (targetWidth + 40), h / (targetHeight + 100), 1);
   const tx = w / 2 - positions[current][0] * scale;
   const ty = h / 2 - positions[current][1] * scale;
 
